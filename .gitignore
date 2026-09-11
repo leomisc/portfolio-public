@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Local data generated from the public source archive
+data/raw/*.csv
+data/processed/*
+
+# Local tools and operating-system files
+.env
+.env.*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Private companion repository and internal planning material
+.private/
+portfolio-13h-guide.md
+docs/consistency-review.md
+docs/superpowers/
