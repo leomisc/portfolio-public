@@ -26,7 +26,7 @@ The source is Windows-1252 encoded. Load it with `encoding="cp1252"` and preserv
 Clone only this repository into a dedicated folder outside OneDrive, Dropbox, or a home-directory sync root:
 
 ```powershell
-git clone https://github.com/leomisc/portfolio.git portfolio
+git clone https://github.com/leomisc/portfolio-public.git portfolio
 cd portfolio
 git pull
 git push
@@ -34,7 +34,7 @@ git push
 
 This project uses GitHub as its only cross-device sync channel. It does not configure a broad cloud-sync service. Future phone-accessible file links use the repository URL, for example:
 
-<https://github.com/leomisc/portfolio/blob/main/README.md>
+<https://github.com/leomisc/portfolio-public/blob/main/README.md>
 
 ## Data and confidentiality
 
