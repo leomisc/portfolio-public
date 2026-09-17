@@ -17,6 +17,8 @@ The SLA analysis is centered on `Order`, while financial and product analysis re
 
 `fact_order_lines` contains one row per `Row ID` and retains `Order ID` as a foreign key. It includes `Product ID`, sales, quantity, discount, and profit so financial impact can be analyzed and connected to products.
 
+The generated line fact retains the source columns only. SLA measures stay on `fact_orders` so order-level values are not duplicated across multiple order lines.
+
 Potential shared dimensions include customer, product, location, ship mode, and date.
 
 ### Validation rule

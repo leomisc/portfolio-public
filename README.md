@@ -8,18 +8,30 @@ The project uses the public Superstore dataset. The source data contains no prom
 
 ## Current status
 
-The repository is set up with the source archive and project documentation. The Python transformation, SQL analyses, processed tables, findings memo, and defense document are the next build phase; they are not claimed as completed here.
+The source inspection and Python transformation are complete for the documented public source. The transformation validates the source, preserves order-line grain, derives a one-row-per-order SLA table, and writes local processed outputs. SQL analyses, the findings memo, and the defense document are the next build phase.
 
 ## Repository files
 
 - [Project overview](portfolio-project-overview.md): intended audience, business value, technical direction, and confidentiality framing.
 - [Source archive](data/raw/superstore_dataset.zip): public Superstore CSV archive.
+- [Inspection notebook](inspection.ipynb): exploratory source inspection and documented assumptions.
+- [Transformation module](scripts/transform_superstore.py): repeatable validation and fact-table generation.
+- [Practice notebook](inspection - practice.ipynb): pandas refresher exercises.
 
 ## Local setup
 
 The archive contains `Sample - Superstore.csv`. Extract it to `data/raw/` when you begin the build. The extracted CSV is intentionally ignored by Git; the portable source archive remains tracked.
 
 The source is Windows-1252 encoded. Load it with `encoding="cp1252"` and preserve `Postal Code` as a string. The fact table remains at order-line grain and uses `Row ID` as its unique line key.
+
+Run the automated checks and transformation from the repository root with:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m scripts.transform_superstore
+```
+
+The generated `data/processed/fact_order_lines.csv` and `data/processed/fact_orders.csv` are local ignored outputs.
 
 ## Work-laptop workflow
 

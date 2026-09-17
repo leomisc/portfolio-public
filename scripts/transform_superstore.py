@@ -17,6 +17,8 @@ SLA_DAYS: dict[str, int] = {
     "Standard Class": 5,
 }
 
+EXPECTED_SOURCE_ROWS = 9994
+
 FEDERAL_HOLIDAYS = np.array(
     [
         # 2014
@@ -106,6 +108,7 @@ ORDER_LEVEL_FIELDS = [
 FACT_ORDER_FIELDS = [
     "Order ID",
     *ORDER_LEVEL_FIELDS,
+    "Calendar Days to Ship",
     "Business Days to Ship",
     "SLA Days",
     "SLA Variance",
@@ -137,11 +140,18 @@ def load_source(path: str | Path) -> pd.DataFrame:
     return frame
 
 
-def validate_source(frame: pd.DataFrame) -> None:
+def validate_source(
+    frame: pd.DataFrame,
+    expected_rows: int | None = EXPECTED_SOURCE_ROWS,
+) -> None:
     """Raise ValueError when the source violates the analysis contract."""
     missing_columns = REQUIRED_COLUMNS - set(frame.columns)
     if missing_columns:
         raise ValueError(f"Missing required columns: {sorted(missing_columns)}")
+    if expected_rows is not None and len(frame) != expected_rows:
+        raise ValueError(
+            f"Expected {expected_rows} rows, found {len(frame)}"
+        )
 
     if frame["Row ID"].isna().any():
         raise ValueError("Row ID contains null values")
@@ -208,6 +218,17 @@ def add_sla_fields(frame: pd.DataFrame) -> pd.DataFrame:
 
 def build_fact_orders(frame: pd.DataFrame) -> pd.DataFrame:
     """Collapse validated order-line data to one row per order."""
+    fields_to_check = [field for field in FACT_ORDER_FIELDS if field != "Order ID"]
+    variation = frame.groupby("Order ID")[fields_to_check].nunique(
+        dropna=False
+    )
+    inconsistent_orders = variation[variation.gt(1).any(axis=1)]
+    if not inconsistent_orders.empty:
+        order_ids = inconsistent_orders.index.tolist()
+        raise ValueError(
+            f"Order-level fields are inconsistent for orders: {order_ids}"
+        )
+
     return (
         frame[FACT_ORDER_FIELDS]
         .drop_duplicates(subset=["Order ID"], keep="first")
@@ -221,12 +242,17 @@ def transform_source(
     """Load, validate, enrich, and split the source into two fact tables."""
     frame = load_source(source_path)
     validate_source(frame)
-    frame["Business Days to Ship"] = calculate_business_days(
-        frame["Order Date"],
-        frame["Ship Date"],
+    fact_order_lines = frame.copy()
+
+    order_sla = frame.copy()
+    order_sla["Calendar Days to Ship"] = (
+        order_sla["Ship Date"] - order_sla["Order Date"]
+    ).dt.days
+    order_sla["Business Days to Ship"] = calculate_business_days(
+        order_sla["Order Date"],
+        order_sla["Ship Date"],
     )
-    fact_order_lines = add_sla_fields(frame)
-    fact_orders = build_fact_orders(fact_order_lines)
+    fact_orders = build_fact_orders(add_sla_fields(order_sla))
     return fact_order_lines, fact_orders
 
 

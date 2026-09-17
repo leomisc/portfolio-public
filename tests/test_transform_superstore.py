@@ -34,6 +34,15 @@ def test_business_days_excludes_supplied_holiday():
     assert result.tolist() == [1]
 
 
+def test_default_federal_holiday_calendar_excludes_observed_holiday():
+    order_dates = pd.Series(pd.to_datetime(["2015-07-02"]))
+    ship_dates = pd.Series(pd.to_datetime(["2015-07-06"]))
+
+    result = calculate_business_days(order_dates, ship_dates)
+
+    assert result.tolist() == [1]
+
+
 def test_add_sla_fields_maps_modes_and_flags_late_rows():
     frame = pd.DataFrame({
         "Ship Mode": ["Same Day", "First Class", "Standard Class"],
@@ -60,6 +69,7 @@ def test_build_fact_orders_collapses_consistent_order_lines():
         "State": ["Test State", "Test State"],
         "Postal Code": ["12345", "12345"],
         "Region": ["West", "West"],
+        "Calendar Days to Ship": [2, 2],
         "Business Days to Ship": [2, 2],
         "SLA Days": [2, 2],
         "SLA Variance": [0, 0],
@@ -70,7 +80,31 @@ def test_build_fact_orders_collapses_consistent_order_lines():
 
     assert len(result) == 1
     assert result.loc[0, "Order ID"] == "A"
+    assert result.loc[0, "Calendar Days to Ship"] == 2
     assert result.loc[0, "Business Days to Ship"] == 2
+
+
+def test_build_fact_orders_rejects_inconsistent_order_fields():
+    frame = pd.DataFrame({
+        "Order ID": ["A", "A"],
+        "Order Date": pd.to_datetime(["2017-01-03", "2017-01-04"]),
+        "Ship Date": pd.to_datetime(["2017-01-05", "2017-01-05"]),
+        "Ship Mode": ["Second Class", "Second Class"],
+        "Customer ID": ["C1", "C1"],
+        "Country": ["United States", "United States"],
+        "City": ["Test City", "Test City"],
+        "State": ["Test State", "Test State"],
+        "Postal Code": ["12345", "12345"],
+        "Region": ["West", "West"],
+        "Calendar Days to Ship": [2, 1],
+        "Business Days to Ship": [2, 2],
+        "SLA Days": [2, 2],
+        "SLA Variance": [0, 0],
+        "Is Late": [False, False],
+    })
+
+    with pytest.raises(ValueError, match="inconsistent"):
+        build_fact_orders(frame)
 
 
 def test_unknown_ship_mode_is_rejected():
