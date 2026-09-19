@@ -7,6 +7,7 @@
 - A result is successful when `Business Days to Ship <= Scenario SLA Days`.
 - A result is late when `Business Days to Ship > Scenario SLA Days`.
 - Financial impact is associated with late orders. It is not a causal estimate of cost.
+- Sensitivity exception: Same Day remains a zero-business-day promise in the strict and lenient scenarios. The one-day shift applies only to modes with a positive base SLA.
 
 The observed federal holiday dates are defined in `scripts/transform_superstore.py`. The calendar covers the 2014–2017 source period and January 1, 2018, which is needed for the source's early-January 2018 shipments.
 
