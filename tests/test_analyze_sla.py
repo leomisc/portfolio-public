@@ -54,6 +54,18 @@ def test_scenarios_treat_sla_equality_as_success_and_keep_same_day_zero():
     assert not bool(lenient_c["Is Late"])
 
 
+def test_calibrated_scenario_uses_observed_sla_mapping():
+    result = build_scenario_orders(make_orders(), make_lines())
+
+    calibrated = result[result["Scenario"] == "calibrated"].set_index("Order ID")
+
+    assert calibrated.loc["A", "Scenario SLA Days"] == 4
+    assert bool(calibrated.loc["A", "Is Late"])
+    assert calibrated.loc["B", "Scenario SLA Days"] == 2
+    assert not bool(calibrated.loc["B", "Is Late"])
+    assert calibrated.loc["C", "Scenario SLA Days"] == 0
+
+
 def test_lenient_scenario_keeps_same_day_at_zero_by_design():
     orders = make_orders()
     orders.loc[orders["Order ID"] == "C", "Business Days to Ship"] = 1
@@ -61,8 +73,8 @@ def test_lenient_scenario_keeps_same_day_at_zero_by_design():
     result = build_scenario_orders(orders, make_lines())
     same_day = result[result["Order ID"] == "C"]
 
-    assert same_day["Scenario SLA Days"].tolist() == [0, 0, 0]
-    assert same_day["Is Late"].tolist() == [True, True, True]
+    assert same_day["Scenario SLA Days"].tolist() == [0, 0, 0, 0]
+    assert same_day["Is Late"].tolist() == [True, True, True, True]
 
 
 def test_summary_calculates_order_rate_and_late_financial_impact():
@@ -71,6 +83,7 @@ def test_summary_calculates_order_rate_and_late_financial_impact():
 
     assert result["Scenario"].drop_duplicates().tolist() == [
         "base",
+        "calibrated",
         "strict",
         "lenient",
     ]

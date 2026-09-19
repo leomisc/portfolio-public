@@ -15,6 +15,13 @@ SCENARIO_SHIFTS = {
     "strict": -1,
     "lenient": 1,
 }
+CALIBRATED_SLA_DAYS = {
+    "Same Day": 0,
+    "First Class": 2,
+    "Second Class": 3,
+    "Standard Class": 4,
+}
+SCENARIO_ORDER = ("base", "calibrated", "strict", "lenient")
 
 
 def aggregate_order_financials(lines: pd.DataFrame) -> pd.DataFrame:
@@ -57,14 +64,19 @@ def build_scenario_orders(
         raise ValueError("Every order must have matching order-line financials")
 
     scenarios: list[pd.DataFrame] = []
-    for scenario, shift in SCENARIO_SHIFTS.items():
+    for scenario in SCENARIO_ORDER:
         current = base_orders.copy()
         current["Scenario"] = scenario
-        current["Scenario SLA Days"] = _scenario_sla_days(
-            current["SLA Days"],
-            current["Ship Mode"],
-            shift,
-        )
+        if scenario == "calibrated":
+            current["Scenario SLA Days"] = (
+                current["Ship Mode"].map(CALIBRATED_SLA_DAYS).astype("int64")
+            )
+        else:
+            current["Scenario SLA Days"] = _scenario_sla_days(
+                current["SLA Days"],
+                current["Ship Mode"],
+                SCENARIO_SHIFTS[scenario],
+            )
         current["Is Late"] = (
             current["Business Days to Ship"] > current["Scenario SLA Days"]
         )
@@ -113,7 +125,7 @@ def summarize_sla(
     summary["Late Order Rate"] = summary["Late Orders"] / summary["Orders"]
     summary["Scenario"] = pd.Categorical(
         summary["Scenario"],
-        categories=list(SCENARIO_SHIFTS),
+        categories=list(SCENARIO_ORDER),
         ordered=True,
     )
     return summary.sort_values(group_fields).reset_index(drop=True)

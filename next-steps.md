@@ -41,16 +41,16 @@ The pipeline writes `fact_order_lines` at `Row ID` grain and `fact_orders` at `O
 
 The exploratory notebook contains the manual spot checks for same-day, weekend, early, on-SLA, and late examples. The automated tests cover source profile, row count, keys, nulls, order consistency, holiday handling, SLA mapping, and fact-table grain.
 
-One-day SLA sensitivity remains part of the analysis phase.
+SLA sensitivity remains part of the analysis phase. The analysis now includes the initial benchmark, strict and lenient one-day sensitivities, and a data-informed calibrated scenario.
 
 ## Completed: initial SLA analysis
 
-The reproducible analysis is in `scripts/analyze_sla.py`, with tests in `tests/test_analyze_sla.py`. It reuses the holiday-aware business-day values from `fact_orders`, aggregates financials by `Order ID`, and writes base, strict, and lenient scenario summaries under `data/processed/analysis/`. See [analysis-notes.md](analysis-notes.md) for the initial results and limitations.
+The reproducible analysis is in `scripts/analyze_sla.py`, with tests in `tests/test_analyze_sla.py`. It reuses the holiday-aware business-day values from `fact_orders`, aggregates financials by `Order ID`, and writes initial, calibrated, strict, and lenient scenario summaries under `data/processed/analysis/`. See [analysis-notes.md](analysis-notes.md) for the results, comparison, and limitations.
 
 ## Next: SQL analysis and communication
 
 - Reproduce the approved summaries in SQL against the processed fact tables.
 - Review monthly results with order-volume context and challenge any unstable patterns.
-- Decide which base-versus-sensitivity findings are strong enough to lead the portfolio story.
+- Lead with the calibrated scenario while showing the initial benchmark to make assumption sensitivity explicit.
 - Write the findings memo: where performance misses, operational impact, recommended action, and limitations.
 - Write the defense document explaining data quality, joins, model design, SQL, and assumptions.
