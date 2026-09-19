@@ -18,6 +18,7 @@
 - Implemented holiday-aware business-day calculations using the agreed endpoint rule: exclude the order date and include the ship date.
 - Added automated validation and regression tests.
 - Added SLA scenario analysis with order-level financial aggregation.
+- Added a PostgreSQL reproduction with explicit scenario mappings, grain assertions, summaries, and Python reconciliation queries.
 - Added four scenarios:
   - Initial benchmark: `0/1/2/5` for Same Day, First Class, Second Class, and Standard Class.
   - Calibrated: `0/2/3/4`.
@@ -32,8 +33,8 @@ The calibrated scenario produces a more balanced comparison: First Class is 17.4
 
 | Work item | Owner | Supervision needed |
 |---|---|---|
-| Reproduce the approved scenarios in SQL against the processed fact tables | Agent | User reviews the SQL logic and reconciled totals |
-| Reconcile SQL results to the Python outputs | Agent | User approves any unexplained difference |
+| Run the PostgreSQL script and confirm zero reconciliation failures | User; `psql` is unavailable on OmenLEO | Agent assists with diagnosis |
+| Review SQL output and approve any unexplained differences | User | Agent assists with diagnosis |
 | Review monthly results with order-volume context | Agent | User challenges unstable or misleading patterns |
 | Draft the findings memo: result, operational interpretation, financial context, and limitations | Agent | User edits wording and approves the final story |
 | Draft the technical defense document covering data quality, grain, joins, dates, SQL, and assumptions | Agent | User reviews recruiter-facing explanations |
@@ -48,6 +49,6 @@ Use the calibrated `0/2/3/4` scenario as the primary comparison because it produ
 ## Current repository state
 
 - Implementation baseline commit: `8daec7a Add calibrated SLA scenario`.
-- Local branch is ahead of `origin/main` by three commits.
-- The latest changes have not been pushed.
+- The PostgreSQL reproduction is implemented locally; live execution is pending on a PostgreSQL-enabled workstation.
+- The latest SQL and documentation changes have not been pushed.
 - The local untracked `AGENTS.md` instruction file was preserved and not modified.

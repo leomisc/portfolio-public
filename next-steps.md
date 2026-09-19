@@ -47,9 +47,15 @@ SLA sensitivity remains part of the analysis phase. The analysis now includes th
 
 The reproducible analysis is in `scripts/analyze_sla.py`, with tests in `tests/test_analyze_sla.py`. It reuses the holiday-aware business-day values from `fact_orders`, aggregates financials by `Order ID`, and writes initial, calibrated, strict, and lenient scenario summaries under `data/processed/analysis/`. See [analysis-notes.md](analysis-notes.md) for the results, comparison, and limitations.
 
-## Next: SQL analysis and communication
+## Completed: PostgreSQL reproduction
 
-- Reproduce the approved summaries in SQL against the processed fact tables.
+The PostgreSQL reproduction is in [sql/fulfillment_sla_analysis.sql](sql/fulfillment_sla_analysis.sql), with explanations in [sql/README.md](sql/README.md). It loads the processed facts with `\copy`, preserves their grains, aggregates financials to order grain, applies all four SLA scenarios, produces overall/ship-mode/region/month summaries, and reconciles the results to the Python output files.
+
+The script has been structurally tested locally. A live PostgreSQL execution remains a supervised user step because `psql` is not installed on OmenLEO.
+
+## Next: communication
+
+- Review the PostgreSQL output on a machine with `psql` and confirm zero reconciliation failures.
 - Review monthly results with order-volume context and challenge any unstable patterns.
 - Lead with the calibrated scenario while showing the initial benchmark to make assumption sensitivity explicit.
 - Write the findings memo: where performance misses, operational impact, recommended action, and limitations.
