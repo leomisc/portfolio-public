@@ -43,9 +43,14 @@ The exploratory notebook contains the manual spot checks for same-day, weekend, 
 
 One-day SLA sensitivity remains part of the analysis phase.
 
-## Next: analyze and communicate
+## Completed: initial SLA analysis
 
-- Run analyses by ship mode, region, month, and SLA scenario.
-- Decide whether results are counted by order, order line, or sales-weighted impact.
+The reproducible analysis is in `scripts/analyze_sla.py`, with tests in `tests/test_analyze_sla.py`. It reuses the holiday-aware business-day values from `fact_orders`, aggregates financials by `Order ID`, and writes base, strict, and lenient scenario summaries under `data/processed/analysis/`. See [analysis-notes.md](analysis-notes.md) for the initial results and limitations.
+
+## Next: SQL analysis and communication
+
+- Reproduce the approved summaries in SQL against the processed fact tables.
+- Review monthly results with order-volume context and challenge any unstable patterns.
+- Decide which base-versus-sensitivity findings are strong enough to lead the portfolio story.
 - Write the findings memo: where performance misses, operational impact, recommended action, and limitations.
 - Write the defense document explaining data quality, joins, model design, SQL, and assumptions.
