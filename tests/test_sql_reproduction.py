@@ -26,3 +26,12 @@ def test_sql_reproduction_has_explicit_sla_scenarios_and_grain_controls():
     assert "(o.business_days_to_ship > s.scenario_sla_days) AS is_late" in sql
     assert "count(*) FILTER (WHERE is_late)" in sql
     assert "reconciliation_overall" in sql
+
+
+def test_sql_reconciliation_tolerates_float_rounding_in_financial_totals():
+    sql = SQL_PATH.read_text(encoding="utf-8")
+
+    assert "abs(s.total_sales - p.total_sales) < 0.0000001" in sql
+    assert "abs(s.late_order_sales - p.late_order_sales) < 0.0000001" in sql
+    assert "abs(s.total_profit - p.total_profit) < 0.0000001" in sql
+    assert "abs(s.late_order_profit - p.late_order_profit) < 0.0000001" in sql

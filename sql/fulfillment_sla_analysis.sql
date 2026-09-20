@@ -329,10 +329,10 @@ SELECT
         s.orders = p.orders
         AND s.successful_orders = p.successful_orders
         AND s.late_orders = p.late_orders
-        AND s.total_sales = p.total_sales
-        AND s.late_order_sales = p.late_order_sales
-        AND s.total_profit = p.total_profit
-        AND s.late_order_profit = p.late_order_profit
+        AND abs(s.total_sales - p.total_sales) < 0.0000001
+        AND abs(s.late_order_sales - p.late_order_sales) < 0.0000001
+        AND abs(s.total_profit - p.total_profit) < 0.0000001
+        AND abs(s.late_order_profit - p.late_order_profit) < 0.0000001
         AND abs(s.success_rate - p.success_rate::numeric) < 1e-12
         AND abs(s.late_order_rate - p.late_order_rate::numeric) < 1e-12,
         false
@@ -352,10 +352,10 @@ SELECT
         s.orders = p.orders
         AND s.successful_orders = p.successful_orders
         AND s.late_orders = p.late_orders
-        AND s.total_sales = p.total_sales
-        AND s.late_order_sales = p.late_order_sales
-        AND s.total_profit = p.total_profit
-        AND s.late_order_profit = p.late_order_profit
+        AND abs(s.total_sales - p.total_sales) < 0.0000001
+        AND abs(s.late_order_sales - p.late_order_sales) < 0.0000001
+        AND abs(s.total_profit - p.total_profit) < 0.0000001
+        AND abs(s.late_order_profit - p.late_order_profit) < 0.0000001
         AND abs(s.success_rate - p.success_rate::numeric) < 1e-12
         AND abs(s.late_order_rate - p.late_order_rate::numeric) < 1e-12,
         false
@@ -371,10 +371,10 @@ SELECT
         s.orders = p.orders
         AND s.successful_orders = p.successful_orders
         AND s.late_orders = p.late_orders
-        AND s.total_sales = p.total_sales
-        AND s.late_order_sales = p.late_order_sales
-        AND s.total_profit = p.total_profit
-        AND s.late_order_profit = p.late_order_profit
+        AND abs(s.total_sales - p.total_sales) < 0.0000001
+        AND abs(s.late_order_sales - p.late_order_sales) < 0.0000001
+        AND abs(s.total_profit - p.total_profit) < 0.0000001
+        AND abs(s.late_order_profit - p.late_order_profit) < 0.0000001
         AND abs(s.success_rate - p.success_rate::numeric) < 1e-12
         AND abs(s.late_order_rate - p.late_order_rate::numeric) < 1e-12,
         false
@@ -390,10 +390,10 @@ SELECT
         s.orders = p.orders
         AND s.successful_orders = p.successful_orders
         AND s.late_orders = p.late_orders
-        AND s.total_sales = p.total_sales
-        AND s.late_order_sales = p.late_order_sales
-        AND s.total_profit = p.total_profit
-        AND s.late_order_profit = p.late_order_profit
+        AND abs(s.total_sales - p.total_sales) < 0.0000001
+        AND abs(s.late_order_sales - p.late_order_sales) < 0.0000001
+        AND abs(s.total_profit - p.total_profit) < 0.0000001
+        AND abs(s.late_order_profit - p.late_order_profit) < 0.0000001
         AND abs(s.success_rate - p.success_rate::numeric) < 1e-12
         AND abs(s.late_order_rate - p.late_order_rate::numeric) < 1e-12,
         false
