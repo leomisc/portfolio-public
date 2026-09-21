@@ -29,7 +29,9 @@ The reproducible Python and PostgreSQL analysis is implemented and the automated
   - Strict: one business day less, except Same Day remains zero.
   - Lenient: one business day more, except Same Day remains zero.
 - Documented the results and limitations in [analysis-notes.md](analysis-notes.md).
-- Verified 18 tests pass and regenerated the analysis outputs.
+- Added a direct-key reporting star schema with five dimensions and an order-line fact, while preserving the existing SLA fact-table contracts.
+- Documented the source Product ID collision limitation and used a descriptor-based product key to preserve all line records.
+- Verified 21 tests pass and regenerated the analysis outputs.
 
 The calibrated scenario produces a more balanced comparison: First Class is 17.4% late, Second Class 16.0%, Standard Class 17.6%, and Same Day 3.4%.
 
@@ -54,6 +56,6 @@ Use the calibrated `0/2/3/4` scenario as the primary comparison because it produ
 
 - Current branch: `main`, aligned with `origin/main` at `2f5a85f Fix SQL reconciliation tolerance`.
 - The PostgreSQL reproduction is implemented and structurally tested locally; live execution is pending on a PostgreSQL-enabled workstation.
-- Automated verification: `18 passed` with `pytest -q`.
-- The latest analysis outputs are local ignored artifacts under `data/processed/analysis/` and can be regenerated from the documented commands.
+- Automated verification: `21 passed` with `pytest -q`.
+- The latest analysis and star-schema outputs are local ignored artifacts under `data/processed/` and can be regenerated from the documented commands.
 - The local untracked `AGENTS.md` instruction file was preserved and not modified.

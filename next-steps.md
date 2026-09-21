@@ -32,7 +32,7 @@ The inspection confirmed 9,994 order-line rows, 9,994 unique `Row ID` values, 5,
 - Calculate calendar days, business days, SLA days, SLA variance, and an `is_late` flag.
 - Keep the fact table at order-line grain.
 
-The pipeline writes `fact_order_lines` at `Row ID` grain and `fact_orders` at `Order ID` grain. Order-level SLA fields are kept on `fact_orders` to avoid duplicating SLA measures across order lines.
+The pipeline writes `fact_order_lines` at `Row ID` grain and `fact_orders` at `Order ID` grain. Order-level SLA fields are kept on `fact_orders` to avoid duplicating SLA measures across order lines. It also writes a reporting star schema: `fact_order_lines_star` plus date, customer, location, product, and ship-mode dimensions. See [data-model-notes.md](data-model-notes.md).
 
 ## Completed: automated validation
 

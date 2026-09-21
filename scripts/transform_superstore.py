@@ -115,6 +115,51 @@ FACT_ORDER_FIELDS = [
     "Is Late",
 ]
 
+STAR_LOCATION_FIELDS = [
+    "Country",
+    "City",
+    "State",
+    "Postal Code",
+    "Region",
+]
+
+STAR_LOCATION_FIELDS_TO_SNAKE = [
+    "country",
+    "city",
+    "state",
+    "postal_code",
+    "region",
+]
+
+STAR_PRODUCT_FIELDS = [
+    "Product ID",
+    "Product Name",
+    "Category",
+    "Sub-Category",
+]
+
+STAR_PRODUCT_FIELDS_TO_SNAKE = [
+    "product_id",
+    "product_name",
+    "category",
+    "sub_category",
+]
+
+STAR_FACT_FIELDS = [
+    "row_id",
+    "order_id",
+    "order_date_key",
+    "ship_date_key",
+    "customer_key",
+    "location_key",
+    "product_key",
+    "ship_mode_key",
+    "sales",
+    "quantity",
+    "discount",
+    "profit",
+]
+
 
 def load_source(path: str | Path) -> pd.DataFrame:
     """Load the raw CSV with the project's required encoding and types."""
@@ -236,6 +281,194 @@ def build_fact_orders(frame: pd.DataFrame) -> pd.DataFrame:
     )
 
 
+def _build_dimension(
+    frame: pd.DataFrame,
+    natural_columns: list[str],
+    attribute_columns: list[str],
+    rename_map: dict[str, str],
+    key_column: str,
+    label: str,
+) -> pd.DataFrame:
+    """Build a deterministic dimension and reject conflicting attributes."""
+    if attribute_columns:
+        variation = frame.groupby(natural_columns, dropna=False)[
+            attribute_columns
+        ].nunique(dropna=False)
+        if variation.gt(1).any(axis=1).any():
+            raise ValueError(f"{label} attributes are inconsistent")
+
+    columns = [*natural_columns, *attribute_columns]
+    dimension = (
+        frame[columns]
+        .drop_duplicates()
+        .sort_values(natural_columns)
+        .drop_duplicates(subset=natural_columns, keep="first")
+        .reset_index(drop=True)
+        .rename(columns=rename_map)
+    )
+    dimension.insert(0, key_column, range(1, len(dimension) + 1))
+    return dimension
+
+
+def build_star_schema(frame: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """Build direct-key dimensions and an order-line star-schema fact."""
+    dimensions = {
+        "dim_customer": _build_dimension(
+            frame,
+            ["Customer ID"],
+            ["Customer Name", "Segment"],
+            {
+                "Customer ID": "customer_id",
+                "Customer Name": "customer_name",
+                "Segment": "segment",
+            },
+            "customer_key",
+            "Customer",
+        ),
+        "dim_location": _build_dimension(
+            frame,
+            STAR_LOCATION_FIELDS,
+            [],
+            {
+                "Country": "country",
+                "City": "city",
+                "State": "state",
+                "Postal Code": "postal_code",
+                "Region": "region",
+            },
+            "location_key",
+            "Location",
+        ),
+        "dim_product": _build_dimension(
+            frame,
+            STAR_PRODUCT_FIELDS,
+            [],
+            {
+                "Product ID": "product_id",
+                "Product Name": "product_name",
+                "Category": "category",
+                "Sub-Category": "sub_category",
+            },
+            "product_key",
+            "Product",
+        ),
+        "dim_ship_mode": _build_dimension(
+            frame,
+            ["Ship Mode"],
+            [],
+            {"Ship Mode": "ship_mode"},
+            "ship_mode_key",
+            "Ship mode",
+        ),
+    }
+
+    min_date = min(frame["Order Date"].min(), frame["Ship Date"].min())
+    max_date = max(frame["Order Date"].max(), frame["Ship Date"].max())
+    dates = pd.date_range(min_date, max_date, freq="D")
+    dim_date = pd.DataFrame({"date": dates})
+    dim_date.insert(
+        0,
+        "date_key",
+        dim_date["date"].dt.strftime("%Y%m%d").astype("int64"),
+    )
+    dim_date["year"] = dim_date["date"].dt.year
+    dim_date["quarter"] = dim_date["date"].dt.quarter
+    dim_date["month"] = dim_date["date"].dt.month
+    dim_date["month_name"] = dim_date["date"].dt.month_name()
+    dim_date["day_of_week"] = dim_date["date"].dt.day_name()
+    dim_date["is_weekend"] = dim_date["date"].dt.dayofweek >= 5
+    dimensions["dim_date"] = dim_date
+
+    fact = frame[
+        [
+            "Row ID",
+            "Order ID",
+            "Order Date",
+            "Ship Date",
+            "Customer ID",
+            *STAR_PRODUCT_FIELDS,
+            "Ship Mode",
+            *STAR_LOCATION_FIELDS,
+            "Sales",
+            "Quantity",
+            "Discount",
+            "Profit",
+        ]
+    ].rename(
+        columns={
+            "Row ID": "row_id",
+            "Order ID": "order_id",
+            "Order Date": "order_date",
+            "Ship Date": "ship_date",
+            "Customer ID": "customer_id",
+            "Product ID": "product_id",
+            "Product Name": "product_name",
+            "Category": "category",
+            "Sub-Category": "sub_category",
+            "Ship Mode": "ship_mode",
+            "Country": "country",
+            "City": "city",
+            "State": "state",
+            "Postal Code": "postal_code",
+            "Region": "region",
+            "Sales": "sales",
+            "Quantity": "quantity",
+            "Discount": "discount",
+            "Profit": "profit",
+        }
+    )
+
+    date_lookup = dimensions["dim_date"][["date", "date_key"]]
+    fact = fact.merge(
+        date_lookup.rename(columns={"date": "order_date", "date_key": "order_date_key"}),
+        on="order_date",
+        how="left",
+        validate="many_to_one",
+    ).merge(
+        date_lookup.rename(columns={"date": "ship_date", "date_key": "ship_date_key"}),
+        on="ship_date",
+        how="left",
+        validate="many_to_one",
+    )
+    fact = fact.merge(
+        dimensions["dim_customer"][["customer_id", "customer_key"]],
+        on="customer_id",
+        how="left",
+        validate="many_to_one",
+    ).merge(
+        dimensions["dim_product"][
+            [*STAR_PRODUCT_FIELDS_TO_SNAKE, "product_key"]
+        ],
+        on=STAR_PRODUCT_FIELDS_TO_SNAKE,
+        how="left",
+        validate="many_to_one",
+    ).merge(
+        dimensions["dim_ship_mode"][["ship_mode", "ship_mode_key"]],
+        on="ship_mode",
+        how="left",
+        validate="many_to_one",
+    ).merge(
+        dimensions["dim_location"][
+            ["country", "city", "state", "postal_code", "region", "location_key"]
+        ],
+        on=STAR_LOCATION_FIELDS_TO_SNAKE,
+        how="left",
+        validate="many_to_one",
+    )
+
+    fact = fact[STAR_FACT_FIELDS]
+    if fact.isna().any().any():
+        raise ValueError("Star fact contains null dimension keys")
+    return {
+        "dim_date": dimensions["dim_date"],
+        "dim_customer": dimensions["dim_customer"],
+        "dim_location": dimensions["dim_location"],
+        "dim_product": dimensions["dim_product"],
+        "dim_ship_mode": dimensions["dim_ship_mode"],
+        "fact_order_lines_star": fact,
+    }
+
+
 def transform_source(
     source_path: str | Path,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -271,6 +504,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     fact_order_lines, fact_orders = transform_source(args.source)
+    star_schema = build_star_schema(fact_order_lines)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     fact_order_lines.to_csv(
         args.output_dir / "fact_order_lines.csv",
@@ -282,8 +516,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         index=False,
         date_format="%Y-%m-%d",
     )
+    for table_name, table in star_schema.items():
+        table.to_csv(
+            args.output_dir / f"{table_name}.csv",
+            index=False,
+            date_format="%Y-%m-%d",
+        )
     print(f"Wrote {len(fact_order_lines):,} order lines")
     print(f"Wrote {len(fact_orders):,} orders")
+    print("Wrote star-schema dimensions and order-line fact")
     return 0
 
 

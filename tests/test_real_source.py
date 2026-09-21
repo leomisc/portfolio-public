@@ -1,10 +1,12 @@
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from scripts.transform_superstore import (
     FACT_ORDER_FIELDS,
     ORDER_LEVEL_FIELDS,
+    main,
     load_source,
     validate_source,
     transform_source,
@@ -63,3 +65,36 @@ def test_transformed_fact_tables_have_expected_grain():
         "SLA Variance",
         "Is Late",
     }.issubset(fact_orders.columns)
+
+
+def test_cli_writes_star_schema_tables(tmp_path):
+    assert main([
+        "--source",
+        str(SOURCE_PATH),
+        "--output-dir",
+        str(tmp_path),
+    ]) == 0
+
+    expected_files = {
+        "dim_date.csv",
+        "dim_customer.csv",
+        "dim_location.csv",
+        "dim_product.csv",
+        "dim_ship_mode.csv",
+        "fact_order_lines_star.csv",
+    }
+    assert expected_files.issubset(
+        {path.name for path in tmp_path.iterdir()}
+    )
+
+    star_fact = pd.read_csv(tmp_path / "fact_order_lines_star.csv")
+    assert len(star_fact) == 9994
+    assert star_fact["row_id"].is_unique
+    assert star_fact[[
+        "order_date_key",
+        "ship_date_key",
+        "customer_key",
+        "location_key",
+        "product_key",
+        "ship_mode_key",
+    ]].notna().all().all()

@@ -15,7 +15,7 @@ The source inspection and Python transformation are complete for the documented 
 - [Project overview](portfolio-project-overview.md): intended audience, business value, technical direction, and confidentiality framing.
 - [Source archive](data/raw/superstore_dataset.zip): public Superstore CSV archive.
 - [Inspection notebook](inspection.ipynb): exploratory source inspection and documented assumptions.
-- [Transformation module](scripts/transform_superstore.py): repeatable validation and fact-table generation.
+- [Transformation module](scripts/transform_superstore.py): repeatable validation, SLA facts, and star-schema generation.
 - [Practice notebook](inspection - practice.ipynb): pandas refresher exercises.
 
 ## Local setup
@@ -31,7 +31,15 @@ Run the automated checks and transformation from the repository root with:
 .\.venv\Scripts\python.exe -m scripts.transform_superstore
 ```
 
-The generated `data/processed/fact_order_lines.csv` and `data/processed/fact_orders.csv` are local ignored outputs.
+The generated files under `data/processed/` are local ignored outputs. They include:
+
+- `fact_order_lines.csv`: validated source-shaped line fact used by the current SLA analysis;
+- `fact_orders.csv`: one-row-per-order SLA fact;
+- `fact_order_lines_star.csv`: direct-key reporting fact at order-line grain; and
+- `dim_date.csv`, `dim_customer.csv`, `dim_location.csv`, `dim_product.csv`, and `dim_ship_mode.csv`.
+
+See [Data Model Notes](data-model-notes.md) for the grain, key choices, and
+the source Product ID quality limitation.
 
 ## Work-laptop workflow
 
