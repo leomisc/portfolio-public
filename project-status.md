@@ -54,7 +54,7 @@ Use the calibrated `0/2/3/4` scenario as the primary comparison because it produ
 
 ## Current repository state
 
-- Current branch: `main`, aligned with `origin/main` at `2f5a85f Fix SQL reconciliation tolerance`.
+- Current branch: `main`; GitHub remains the cross-workstation source of truth.
 - The PostgreSQL reproduction is implemented and structurally tested locally; live execution is pending on a PostgreSQL-enabled workstation.
 - Automated verification: `21 passed` with `pytest -q`.
 - The latest analysis and star-schema outputs are local ignored artifacts under `data/processed/` and can be regenerated from the documented commands.
