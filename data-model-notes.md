@@ -34,7 +34,7 @@ these dimensions:
 ```text
                  dim_product
                       |
-dim_customer — fact_order_lines_star — dim_location
+dim_customer | fact_order_lines_star | dim_location
                       |
                   dim_date
                       |

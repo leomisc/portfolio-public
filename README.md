@@ -1,61 +1,62 @@
 # Superstore Fulfillment SLA Analysis
 
-This repository is the working home for a portfolio project about one practical operations question:
-
 > Where does a shipping promise break, what does it cost operationally, and what should change?
 
-The project uses the public Superstore dataset. The source data contains no promised delivery date or SLA, so the project defines a transparent ship-mode-specific SLA and tests how the conclusions change when that assumption moves by one business day.
+I used the public Superstore dataset to model fulfillment performance from order placement through shipment. The source has no promised delivery date, so I defined a transparent, ship-mode-specific SLA and tested how the result changes when the assumption moves by one business day.
 
 ## Current status
 
-The source inspection, Python transformation, and live PostgreSQL reproduction are complete for the documented public source. The transformation validates the source, preserves order-line grain, derives a one-row-per-order SLA table, and writes local processed outputs. The findings memo and defense document are the next build phase.
+The Python transformation, SLA analysis, reporting star schema, and PostgreSQL reproduction are complete. The automated suite reports 21 passing tests. The live SQL run on OmenLEO matched the Python outputs with zero reconciliation failures across overall, ship-mode, regional, and monthly summaries.
 
-## Repository files
+The remaining portfolio work is presentation refinement. The findings and technical explanation are documented in:
 
-- [Project overview](portfolio-project-overview.md): intended audience, business value, technical direction, and confidentiality framing.
-- [Source archive](data/raw/superstore_dataset.zip): public Superstore CSV archive.
-- [Inspection notebook](inspection.ipynb): exploratory source inspection and documented assumptions.
-- [Transformation module](scripts/transform_superstore.py): repeatable validation, SLA facts, and star-schema generation.
-- [Practice notebook](inspection - practice.ipynb): pandas refresher exercises.
+- [Findings memo](findings-memo.md): the business question, results, operational interpretation, and limitations.
+- [Technical defense](technical-defense.md): the Python and SQL design, grain choices, validation, and interview-level explanations.
 
-## Local setup
+## Headline result
 
-The archive contains `Sample - Superstore.csv`. Extract it to `data/raw/` when you begin the build. The extracted CSV is intentionally ignored by Git; the portable source archive remains tracked.
+I use the calibrated `0/2/3/4` scenario as the primary comparison. It produces a similar late-rate range across the three non-Same-Day modes:
 
-The source is Windows-1252 encoded. Load it with `encoding="cp1252"` and preserve `Postal Code` as a string. The fact table remains at order-line grain and uses `Row ID` as its unique line key.
+| Ship mode | Orders | Late orders | Late-order rate |
+|---|---:|---:|---:|
+| First Class | 787 | 137 | 17.4% |
+| Second Class | 964 | 154 | 16.0% |
+| Standard Class | 2,994 | 526 | 17.6% |
+| Same Day | 264 | 9 | 3.4% |
 
-Run the automated checks and transformation from the repository root with:
+The conclusion is assumption-sensitive. The overall late-order rate is 15.2% under the initial benchmark, 16.5% under the calibrated scenario, 37.4% under the strict sensitivity, and 6.0% under the lenient sensitivity. These are modeled comparisons, not official contractual SLA results.
+
+## What I built
+
+- A validated Python transformation that profiles the source, preserves order-line grain, and creates a one-row-per-order SLA fact.
+- Holiday-aware business-day logic that excludes the order date and includes the ship date.
+- Four explicit SLA scenarios: base, calibrated, strict, and lenient.
+- A reporting star schema with date, customer, location, product, and ship-mode dimensions.
+- A PostgreSQL reproduction that preserves both fact-table grains, aggregates financials to order grain, produces four summary families, and reconciles to Python.
+- Automated tests for source quality, dates, grain, keys, SLA logic, and star-schema integrity.
+
+## Reproduce the analysis
+
+Run these commands from the repository root:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\python.exe -m scripts.transform_superstore
+.\.venv\Scripts\python.exe -m scripts.analyze_sla
+psql -d portfolio_sla -f sql\fulfillment_sla_analysis.sql
 ```
 
-The generated files under `data/processed/` are local ignored outputs. They include:
+The SQL script uses temporary tables and ends with `ROLLBACK`. It reads the processed CSV files from the client machine and does not create persistent database objects.
 
-- `fact_order_lines.csv`: validated source-shaped line fact used by the current SLA analysis;
-- `fact_orders.csv`: one-row-per-order SLA fact;
-- `fact_order_lines_star.csv`: direct-key reporting fact at order-line grain; and
-- `dim_date.csv`, `dim_customer.csv`, `dim_location.csv`, `dim_product.csv`, and `dim_ship_mode.csv`.
+## Repository map
 
-See [Data Model Notes](data-model-notes.md) for the grain, key choices, and
-the source Product ID quality limitation.
-
-## Work-laptop workflow
-
-Clone only this repository into a dedicated folder outside OneDrive, Dropbox, or a home-directory sync root:
-
-```powershell
-git clone https://github.com/leomisc/portfolio-public.git portfolio
-cd portfolio
-git pull
-git push
-```
-
-This project uses GitHub as its only cross-device sync channel. It does not configure a broad cloud-sync service. Future phone-accessible file links use the repository URL, for example:
-
-<https://github.com/leomisc/portfolio-public/blob/main/README.md>
+- `scripts/transform_superstore.py`: source validation, business-day logic, facts, and star schema.
+- `scripts/analyze_sla.py`: scenario analysis and Python summaries.
+- `sql/fulfillment_sla_analysis.sql`: PostgreSQL reproduction and reconciliation.
+- `analysis-notes.md`: detailed definitions, results, and interpretation limits.
+- `data-model-notes.md`: grain, key, join, and dimension decisions.
+- `tests/`: automated validation and regression coverage.
 
 ## Data and confidentiality
 
-This uses a public dataset. It demonstrates the same analysis pattern built in production—turning operational data into documented rules, validated transformations, and decision-ready analysis—without exposing employer data or confidential figures.
+This uses a public dataset. It demonstrates the same analysis pattern built in production: turning operational data into documented rules, validated transformations, and decision-ready analysis without exposing employer data or confidential figures.

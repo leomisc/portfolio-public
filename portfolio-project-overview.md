@@ -1,6 +1,6 @@
 # Superstore Fulfillment SLA Analysis
 
-> **Status:** Source inspection, validated transformation, SLA analysis, PostgreSQL reproduction, and reporting star-schema exports are implemented. Findings and final portfolio communication remain in progress.
+> **Status:** Source inspection, validated transformation, SLA analysis, PostgreSQL reproduction, findings memo, and technical defense are implemented. A dashboard remains optional.
 
 ## Project question
 
@@ -48,11 +48,12 @@ The deliverable is designed to answer a practical operations question, not showc
 isolation: identify where service performance misses the stated promise, distinguish robust findings
 from assumption-sensitive ones, and recommend a concrete next action.
 
-The remaining portfolio work is to write the findings memo and select the clearest charts or tables
-for the final presentation.
+The written deliverables are [findings-memo.md](findings-memo.md) and
+[technical-defense.md](technical-defense.md). A dashboard remains optional and should be built only
+after the written metrics and definitions are stable.
 
 ## Data and confidentiality
 
-This project uses public data. It demonstrates the same analysis pattern I use in production—turning
+This project uses public data. It demonstrates the same analysis pattern I use in production: turning
 messy operational data into documented rules, validated transformations, and decision-ready
-analysis—without exposing employer data or confidential figures.
+analysis without exposing employer data or confidential figures.

@@ -1,5 +1,7 @@
 # SLA Analysis Notes
 
+This file is the calculation ledger. Read [findings-memo.md](findings-memo.md) for the consolidated business story and [technical-defense.md](technical-defense.md) for the implementation explanation.
+
 ## Definitions
 
 - `Business Days to Ship` comes from the holiday-aware transformation and excludes weekends, observed federal holidays in the source period, and the order date while including the ship date.
@@ -59,6 +61,18 @@ Standard Class has no late orders under the five-day initial benchmark because f
 The conclusion is assumption-sensitive. Under the initial benchmark, First and Second Class appear to perform much worse than Standard Class. Under the calibrated scenario, all three non-Same-Day modes have late rates between 16.0% and 17.6%, which is a more balanced comparison. The overall late rate rises slightly because the calibrated scenario adds 526 Standard Class late orders while removing 230 First Class and 232 Second Class late orders.
 
 The calibrated scenario should be the primary presentation scenario for comparing ship modes, while the initial benchmark should remain visible as an assumption-sensitivity comparison. Neither should be described as the official contractual SLA because the source does not contain promised-delivery fields.
+
+## Order-level discount and profit diagnostic
+
+I compared late and on-time orders under the calibrated scenario after aggregating line-level values to `Order ID`. Discount was measured as a sales-weighted order rate because discount is not additive.
+
+| Measure | Late orders | On-time orders |
+|---|---:|---:|
+| Sales-weighted discount | 15.1% | 15.5% |
+| Average order profit | $55.88 | $57.43 |
+| Average profit margin | 11.9% | 11.2% |
+
+The correlation between late status and weighted discount was approximately `-0.008`. The correlation between late status and order profit was approximately `-0.002`. These values do not support a general relationship between lateness, higher discounting, or lower profit. First Class and Second Class show lower average profit among late orders, but the pattern changes by ship mode and is not explained by higher discounts.
 
 ## Interpretation limits
 
