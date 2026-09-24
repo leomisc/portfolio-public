@@ -8,7 +8,7 @@ The project uses the public Superstore dataset. The source data contains no prom
 
 ## Current status
 
-The source inspection and Python transformation are complete for the documented public source. The transformation validates the source, preserves order-line grain, derives a one-row-per-order SLA table, and writes local processed outputs. SQL analyses, the findings memo, and the defense document are the next build phase.
+The source inspection, Python transformation, and live PostgreSQL reproduction are complete for the documented public source. The transformation validates the source, preserves order-line grain, derives a one-row-per-order SLA table, and writes local processed outputs. The findings memo and defense document are the next build phase.
 
 ## Repository files
 

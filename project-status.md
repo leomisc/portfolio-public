@@ -1,8 +1,8 @@
 # Fulfillment SLA Portfolio Status
 
-Last verified: 2026-09-21
+Last verified: 2026-09-23
 
-The reproducible Python and PostgreSQL analysis is implemented and the automated test suite passes. The remaining work is validation on a PostgreSQL-enabled machine, interpretation, and portfolio communication.
+The reproducible Python and PostgreSQL analysis is implemented, the live SQL reproduction has been verified, and the automated test suite passes. The remaining work is interpretation and portfolio communication.
 
 ## Completed
 
@@ -13,6 +13,7 @@ The reproducible Python and PostgreSQL analysis is implemented and the automated
 - Confirmed one country, no missing values, and consistent order-level fields.
 - Approved order-level grain, holiday-aware business-day calculation, and SLA equality as success.
 - Approved showing both the original and calibrated SLA assumptions.
+- Ran the PostgreSQL reproduction on OmenLEO and confirmed zero reconciliation failures across overall, ship-mode, region, and monthly outputs.
 
 ### Agent
 
@@ -39,8 +40,6 @@ The calibrated scenario produces a more balanced comparison: First Class is 17.4
 
 | Work item | Owner | Supervision needed |
 |---|---|---|
-| Run the PostgreSQL script and confirm zero reconciliation failures | User, on a PostgreSQL-enabled machine | Agent assists with diagnosis |
-| Review SQL output and approve any unexplained differences | User | Agent assists with diagnosis |
 | Review monthly results with order-volume context | Agent | User challenges unstable or misleading patterns |
 | Draft the findings memo covering results, operational interpretation, financial context, and limitations | Agent | User edits wording and approves the final story |
 | Draft the technical defense document covering data quality, grain, joins, dates, SQL, and assumptions | Agent | User reviews recruiter-facing explanations |
@@ -55,7 +54,7 @@ Use the calibrated `0/2/3/4` scenario as the primary comparison because it produ
 ## Current repository state
 
 - Current branch: `main`; GitHub remains the cross-workstation source of truth.
-- The PostgreSQL reproduction is implemented and structurally tested locally; live execution is pending on a PostgreSQL-enabled workstation.
+- The PostgreSQL reproduction completed on OmenLEO with zero reconciliation failures across all four output families; the script ended with `ROLLBACK`.
 - Automated verification: `21 passed` with `pytest -q`.
 - The latest analysis and star-schema outputs are local ignored artifacts under `data/processed/` and can be regenerated from the documented commands.
 - The local untracked `AGENTS.md` instruction file was preserved and not modified.

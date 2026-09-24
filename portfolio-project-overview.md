@@ -48,8 +48,8 @@ The deliverable is designed to answer a practical operations question, not showc
 isolation: identify where service performance misses the stated promise, distinguish robust findings
 from assumption-sensitive ones, and recommend a concrete next action.
 
-The remaining portfolio work is to review the PostgreSQL output, write the findings memo, and select
-the clearest charts or tables for the final presentation.
+The remaining portfolio work is to write the findings memo and select the clearest charts or tables
+for the final presentation.
 
 ## Data and confidentiality
 

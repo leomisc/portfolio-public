@@ -51,11 +51,10 @@ The reproducible analysis is in `scripts/analyze_sla.py`, with tests in `tests/t
 
 The PostgreSQL reproduction is in [sql/fulfillment_sla_analysis.sql](sql/fulfillment_sla_analysis.sql), with explanations in [sql/README.md](sql/README.md). It loads the processed facts with `\copy`, preserves their grains, aggregates financials to order grain, applies all four SLA scenarios, produces overall/ship-mode/region/month summaries, and reconciles the results to the Python output files.
 
-The script has been structurally tested locally. A live PostgreSQL execution remains a supervised user step because `psql` is not installed on OmenLEO.
+The script was executed on OmenLEO and completed successfully. SQL matched the Python outputs with zero reconciliation failures for overall, ship-mode, region, and monthly summaries. The script ended with `ROLLBACK`, so no persistent database objects were changed.
 
 ## Next: communication
 
-- Review the PostgreSQL output on a machine with `psql` and confirm zero reconciliation failures.
 - Review monthly results with order-volume context and challenge any unstable patterns.
 - Lead with the calibrated scenario while showing the initial benchmark to make assumption sensitivity explicit.
 - Write the findings memo: where performance misses, operational impact, recommended action, and limitations.
