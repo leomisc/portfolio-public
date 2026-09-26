@@ -1,40 +1,23 @@
-# Superstore Fulfillment SLA Analysis
+# Superstore Fulfillment Timing — Portfolio Summary
 
-## Project question
+## Question
 
-How does time to shipment vary across service modes, regions, and product groups, and where should an operations team investigate further?
+Where does the time between order placement and shipment warrant closer operational review?
 
-## Project summary
+## Method
 
-This project analyzes order-to-ship time in the public Superstore dataset. Because the source has no promised ship or delivery date, it applies explicit ship-mode thresholds and reports the sensitivity of the results to those assumptions.
+This project uses the public Superstore dataset to calculate holiday-aware business days from order date to ship date. It evaluates 5,009 orders against documented thresholds for each ship mode, then tests how the results change under alternative thresholds. Order-level shipment status is kept separate from line-level sales and profit to avoid double counting.
 
-Under the exploratory calibrated scenario, 826 of 5,009 orders (16.5%) exceed their time-to-ship threshold. Rates are 17.4% for First Class, 16.0% for Second Class, 17.6% for Standard Class, and 3.4% for Same Day. The thresholds were selected with reference to this dataset; these rates do not measure performance against an external promise.
+## Findings
 
-The analysis compares regional volume and rates, annual ship-mode patterns, and selected product combinations. East has the lowest regional rate despite substantial volume. Among the selected cross-tab cells, Central × Standard Class × Binders has the largest sample: 46 of 200 orders (23.0%) exceed the threshold.
+Under the exploratory calibrated thresholds, 826 orders (16.5%) are classified as late. The result is sensitive to the assumption: the four scenarios produce overall rates from 6.0% to 37.4%. Regional volume alone does not explain the variation. In the product-level review, Central × Standard Class × Binders has the most classified-late orders of any eligible subcategory, mode, and region cell: 46 of 200 orders (23.0%). Smaller cells have higher rates, so both counts and percentages matter.
 
-## What is included
+## Recommended next step
 
-- A validated Python transformation that preserves the source order-line grain and creates a separate one-row-per-order SLA fact.
-- Holiday-aware business-day calculation with explicit endpoint rules.
-- Four SLA scenarios: initial benchmark, calibrated, strict, and lenient.
-- A reporting star schema with direct-key dimensions for dates, customers, locations, products, and ship modes.
-- A PostgreSQL reproduction that aggregates financials at order grain before joining SLA status and reconciles its summaries to Python.
-- Automated tests for source quality, grain, keys, dates, SLA logic, and star-schema foreign keys.
-- Three reproducible SVG charts for regional volume, yearly ship-mode performance, and product hotspots.
+Record the actual promised ship or delivery date before using these results as a service scorecard. Until then, review the higher-volume combinations with their order counts alongside their modeled rates.
 
-## Approach
+## Scope
 
-The project documents business rules, validates source data, separates order-level shipment measures from line-level financial measures, and presents rates with their order counts. The result is a reproducible starting point for an operational review.
+The analysis measures time to shipment, not customer delivery. Its thresholds were selected for exploration and are not contractual promises. Sales and profit attached to classified-late orders are descriptive totals, not losses caused by shipment timing.
 
-## Documentation
-
-- [README](README.md): public project overview and reproduction commands.
-- [Findings memo](findings-memo.md): business findings, operational interpretation, recommendations, and limitations.
-- [Technical defense](technical-defense.md): implementation choices, validation, SQL/Python responsibilities, and technical questions.
-- [Analysis appendix](analysis-notes.md): definitions, calculations, cross-tab methodology, and interpretation limits.
-- [Data model notes](data-model-notes.md): grain, keys, joins, dimensions, and scope constraints.
-- [PostgreSQL reproduction notes](sql/README.md): SQL responsibilities and reconciliation approach.
-
-## Data and scope
-
-The dataset is public. The results describe shipment timing under modeled thresholds; they do not measure delivery to the customer or contractual SLA performance. The data does not establish causal financial loss or customer harm.
+For methods, charts, and reproduction commands, see the [project README](README.md). The [findings memo](findings-memo.md) contains the full business interpretation.

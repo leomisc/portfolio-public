@@ -204,51 +204,58 @@ def hotspot_chart(scenario: pd.DataFrame, lines: pd.DataFrame) -> str:
         .agg(orders=("Order ID", "nunique"), late_orders=("Is Late", "sum"))
     )
     data["late_rate"] = data["late_orders"] / data["orders"]
-    eligible = data[data["orders"] >= 30].sort_values(["late_rate", "orders"], ascending=[False, False])
-    largest_volume_hotspot = eligible[
-        (eligible["Sub-Category"] == "Binders")
-        & (eligible["Ship Mode"] == "Standard Class")
-        & (eligible["Region"] == "Central")
-    ]
-    data = pd.concat([eligible.head(9), largest_volume_hotspot]).drop_duplicates(
+    eligible = data[data["orders"] >= 30]
+    highest_rates = eligible.sort_values(["late_rate", "orders"], ascending=[False, False]).head(9)
+    highest_late_count = eligible.sort_values(["late_orders", "orders"], ascending=[False, False]).head(1)
+    data = pd.concat([highest_rates, highest_late_count]).drop_duplicates(
         ["Sub-Category", "Ship Mode", "Region"]
-    ).copy()
+    ).sort_values(["late_orders", "orders"], ascending=[False, False]).copy()
     data["label"] = data.apply(lambda r: f"{r['Sub-Category']} · {r['Ship Mode']} · {r['Region']}", axis=1)
-    data = data.iloc[::-1]
+    leader_key = tuple(highest_late_count.iloc[0][["Sub-Category", "Ship Mode", "Region"]])
 
-    width, height = 900, 535
-    left, right, top, bottom = 235, 88, 88, 92
+    width, height = 1000, 560
+    left, right, top, bottom = 255, 245, 118, 80
     plot_w, plot_h = width - left - right, height - top - bottom
-    x_map = lambda value: left + value / 0.35 * plot_w
+    x_map = lambda value: left + value / 250 * plot_w
     row_h = plot_h / len(data)
     parts = [
-        text(left, 31, "Selected high-rate subcategory combinations", size=21, weight="700"),
-        text(left, 53, "Only cells with at least 30 distinct orders are shown; the largest-volume hotspot is highlighted.", size=12, fill=MUTED),
+        text(left, 31, "High rates and late-order volume", size=21, weight="700"),
+        text(left, 53, "Calibrated scenario: nine highest-rate cells plus the cell with most late orders; minimum 30 orders.", size=12, fill=MUTED),
+        rect(left, 75, 13, 13, fill=BLUE),
+        text(left + 19, 86, "Late orders", size=11, fill=MUTED),
+        rect(left + 118, 75, 13, 13, fill="#cbd5e1"),
+        text(left + 137, 86, "Other orders", size=11, fill=MUTED),
+        rect(left + 263, 75, 13, 13, fill=ORANGE),
+        text(left + 282, 86, "Highest late-order count", size=11, fill=MUTED),
     ]
-    for tick in [0.00, 0.10, 0.20, 0.30, 0.35]:
+    for tick in [0, 50, 100, 150, 200, 250]:
         x = x_map(tick)
         parts.append(line(x, top, x, top + plot_h, stroke=GRID, width=0.8))
-        parts.append(text(x, top + plot_h + 24, f"{tick:.0%}", size=11, fill=MUTED, anchor="middle"))
+        parts.append(text(x, top + plot_h + 23, str(tick), size=11, fill=MUTED, anchor="middle"))
 
-    for index, row in enumerate(data.itertuples(index=False)):
-        y = top + index * row_h + row_h * 0.18
-        bar_h = row_h * 0.64
-        color = ORANGE if row.label == "Binders · Standard Class · Central" else BLUE
-        parts.append(text(left - 12, y + bar_h * 0.72, row.label, size=11, fill=TEXT, anchor="end"))
-        parts.append(rect(left, y, x_map(row.late_rate) - left, bar_h, fill=color, radius=3))
-        parts.append(text(width - 12, y + bar_h * 0.72, f"{row.late_rate:.1%} ({int(row.late_orders)}/{int(row.orders)})", size=11, fill=color, anchor="end", weight="700"))
+    for index, (_, row) in enumerate(data.iterrows()):
+        y = top + index * row_h + row_h * 0.19
+        bar_h = row_h * 0.62
+        key = (row["Sub-Category"], row["Ship Mode"], row["Region"])
+        color = ORANGE if key == leader_key else BLUE
+        parts.append(text(left - 12, y + bar_h * 0.72, row["label"], size=12, fill=TEXT, anchor="end"))
+        parts.append(rect(left, y, x_map(row["late_orders"]) - left, bar_h, fill=color))
+        parts.append(rect(x_map(row["late_orders"]), y,
+                          x_map(row["orders"]) - x_map(row["late_orders"]), bar_h, fill="#cbd5e1"))
+        parts.append(text(left + plot_w + 18, y + bar_h * 0.72,
+                          f"{int(row['late_orders'])} late / {int(row['orders'])} orders · {row['late_rate']:.1%}",
+                          size=12, fill=color, weight="700"))
 
     parts.extend([
         line(left, top + plot_h, left + plot_w, top + plot_h, stroke=TEXT, width=1.1),
-        text(left + plot_w / 2, height - 25, "Late-order rate", size=12, fill=MUTED, anchor="middle"),
-        text(left + plot_w, height - 48, "late orders / distinct orders", size=11, fill=MUTED, anchor="end"),
+        text(left + plot_w / 2, height - 25, "Distinct orders in each cell", size=12, fill=MUTED, anchor="middle"),
     ])
     return svg_document(
         width,
         height,
         "".join(parts),
-        title="Selected high-rate subcategory combinations",
-        description="A horizontal bar chart of selected subcategory, ship mode, and region combinations with at least 30 distinct orders.",
+        title="High rates and late-order volume by subcategory, ship mode, and region",
+        description="Stacked bars show classified-late and other order counts for the nine highest-rate cells and the cell with the most late orders, each with at least 30 distinct orders. Rates are printed beside the bars.",
     )
 
 

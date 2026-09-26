@@ -12,10 +12,10 @@ The calibrated thresholds were chosen after examining the observed distribution.
 
 | Ship mode | Orders | Late orders | Late-order rate |
 |---|---:|---:|---:|
+| Same Day | 264 | 9 | 3.4% |
 | First Class | 787 | 137 | 17.4% |
 | Second Class | 964 | 154 | 16.0% |
 | Standard Class | 2,994 | 526 | 17.6% |
-| Same Day | 264 | 9 | 3.4% |
 | Total | 5,009 | 826 | 16.5% |
 
 The initial benchmark tells a different story. It assigns five business days to Standard Class, which is the maximum observed business-day shipment time. Standard Class therefore has no late orders under that assumption, while First Class is 46.6% late and Second Class is 40.0% late.
@@ -33,7 +33,7 @@ At a four-day threshold, the calibrated scenario classifies the 526 Standard Cla
 
 The sensitivity range is the reason to describe the SLA as modeled. The strict and lenient scenarios are useful stress tests, not recommended operating policies.
 
-## Monthly results
+## Yearly and monthly results
 
 The overall calibrated rate varies by about one percentage point across the four order years:
 
@@ -69,11 +69,11 @@ State comparisons use a minimum of 100 orders. Among those states, Ohio was lowe
 
 At category level, the rates are close: Office Supplies 16.7%, Technology 16.4%, and Furniture 16.1%. The category counts overlap because one order can contain products from more than one category, so they should not be added together.
 
-Among subcategories with at least 50 orders, rates range from 13.2% for Copiers to 18.9% for Tables. The chart combines subcategory, ship mode, and region and includes only cells with at least 30 distinct orders. Percentages for these smaller cells still need caution.
+Among subcategories with at least 50 orders, rates range from 13.2% for Copiers to 18.9% for Tables. The chart compares the nine highest-rate subcategory × ship mode × region cells with the eligible cell containing the most classified-late orders. Every cell has at least 30 distinct orders. Each bar shows classified-late and other orders; the label gives the rate.
 
-![Selected subcategory hotspots](docs/assets/subcategory-hotspots.svg)
+![Stacked order counts for high-rate cells and the cell with the most classified-late orders](docs/assets/subcategory-hotspots.svg)
 
-Among the selected cells, Central × Standard Class × Binders has the largest sample: 46 of 200 orders (23.0%) exceed the threshold. Central × Second Class × Binders is higher at 31.5%, but is based on 17 of 54 orders. These combinations are candidates for process review, not a ranking of persistent performance.
+Central × Standard Class × Binders has the most classified-late orders among eligible cells: 46 of 200 orders (23.0%). Central × Second Class × Binders has a higher rate at 31.5%, based on 17 of 54 orders. The count difference explains why the first cell is a useful operational starting point, while the higher-rate cells remain investigation candidates. An order containing multiple subcategories can appear in more than one cell.
 
 ## Yearly ship-mode context
 

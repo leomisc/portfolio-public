@@ -29,9 +29,9 @@ By ship mode, the initial benchmark is:
 
 | Ship mode | Orders | Late orders | Late-order rate |
 |---|---:|---:|---:|
+| Same Day | 264 | 9 | 3.4% |
 | First Class | 787 | 367 | 46.6% |
 | Second Class | 964 | 386 | 40.0% |
-| Same Day | 264 | 9 | 3.4% |
 | Standard Class | 2,994 | 0 | 0.0% |
 
 The initial benchmark result is concentrated in First Class and Second Class. Regional rates are relatively close, ranging from 14.7% in the West to 15.8% in the Central region, so the current evidence does not support a strong regional conclusion under that scenario.
@@ -42,9 +42,9 @@ The calibrated thresholds put the three non-Same-Day modes in a similar observed
 
 | Ship mode | Orders | Late orders | Late-order rate |
 |---|---:|---:|---:|
+| Same Day | 264 | 9 | 3.4% |
 | First Class | 787 | 137 | 17.4% |
 | Second Class | 964 | 154 | 16.0% |
-| Same Day | 264 | 9 | 3.4% |
 | Standard Class | 2,994 | 526 | 17.6% |
 
 Standard Class has no late orders under the five-day initial benchmark because five days is the maximum observed business-day shipment time. A four-day scenario exposes the 526 orders that took exactly five business days.
@@ -93,17 +93,9 @@ Category rates were close: Office Supplies 16.7% (624 late of 3,742 orders conta
 
 Among subcategories with at least 50 orders, the highest rates were Tables 18.9% (58 of 307), Phones 18.4% (150 of 814), Binders 18.4% (242 of 1,316), Supplies 18.2% (34 of 187), and Art 17.9% (131 of 731). The lowest were Copiers 13.2% (9 of 68), Bookcases 13.8% (31 of 224), and Chairs 14.1% (81 of 576).
 
-For three-way combinations, the line data is reduced to distinct `(Order ID, Sub-Category)` pairs, joined to order-level mode, region, and late status, and filtered to cells with at least 30 orders. Among the selected high-rate cells, Central × Standard Class × Binders has the largest sample at 23.0% (46 of 200). Central × Second Class × Binders has the highest rate at 31.5% (17 of 54), based on a smaller sample.
+For three-way combinations, the line data is reduced to distinct `(Order ID, Sub-Category)` pairs, joined to order-level mode, region, and late status, and filtered to cells with at least 30 orders. The chart includes the nine highest-rate eligible cells and the eligible cell with the most classified-late orders, then sorts them by late-order count. Central × Standard Class × Binders leads by count at 46 of 200 (23.0%). Central × Second Class × Binders has the highest rate at 31.5% (17 of 54). Counts across subcategories overlap because an order may contain more than one subcategory.
 
-## Reproducible chart outputs
-
-The portfolio charts are generated with:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\create_portfolio_charts.py
-```
-
-The script reads the processed facts, selects the calibrated scenario, and writes the tracked SVG assets under `docs/assets/`.
+The [project README](README.md) gives the commands for regenerating the analysis and charts.
 
 ## Interpretation limits
 

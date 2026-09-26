@@ -23,26 +23,26 @@ Under the calibrated `0/2/3/4` scenario, 826 of 5,009 orders are classified as l
 
 | Ship mode | Orders | Late orders | Late-order rate |
 |---|---:|---:|---:|
+| Same Day | 264 | 9 | 3.4% |
 | First Class | 787 | 137 | 17.4% |
 | Second Class | 964 | 154 | 16.0% |
 | Standard Class | 2,994 | 526 | 17.6% |
-| Same Day | 264 | 9 | 3.4% |
 
 The overall classified-late rate ranges from 6.0% to 37.4% across the four scenarios; the initial benchmark produces 15.2%. These are time-to-ship comparisons under modeled thresholds, not contractual SLA results.
 
 ## What the analysis shows
 
-The three non-Same-Day modes fall into a similar range under the calibrated scenario. Because that scenario was selected using the observed distribution, this similarity is descriptive, not independent evidence that the modes perform equally well. Same Day has a lower classified-late rate and a smaller sample.
-
-The regional view adds useful context. East has the lowest calibrated late rate at 14.8% despite having the second-highest order volume. West carries the largest workload at 1,611 orders but is close to the overall rate at 16.7%. Central has the highest rate at 18.0% despite having fewer orders than East or West. The data does not support a simple conclusion that more volume automatically produces worse performance.
-
-Among the selected product combinations, Central × Standard Class × Binders has the largest order count: 46 of 200 orders (23.0%) are classified as late. Smaller cells have higher rates and warrant investigation rather than a firm ranking.
-
-![Regional order volume and calibrated classified-late rate](docs/assets/regional-volume-late-rate.svg)
+The three non-Same-Day modes fall into a similar range under the calibrated scenario. This similarity is descriptive because the thresholds were chosen using these data. Same Day has a lower classified-late rate and a smaller sample.
 
 ![Yearly classified-late rate by ship mode](docs/assets/ship-mode-yearly-trend.svg)
 
-![Selected subcategory, ship-mode, and regional combinations](docs/assets/subcategory-hotspots.svg)
+The regional view adds useful context. East has the lowest calibrated late rate at 14.8% despite having the second-highest order volume. West carries the largest workload at 1,611 orders but is close to the overall rate at 16.7%. Central has the highest rate at 18.0% despite having fewer orders than East or West. The data does not support a simple conclusion that more volume automatically produces worse performance.
+
+![Regional order volume and calibrated classified-late rate](docs/assets/regional-volume-late-rate.svg)
+
+The product chart places the nine highest-rate subcategory × ship mode × region cells beside the cell with the most classified-late orders. Central × Standard Class × Binders has 46 classified-late orders out of 200 (23.0%): more late orders than the smaller, higher-rate cells. Bar length shows the order count, so the denominator remains visible.
+
+![High-rate cells compared with the cell with the most classified-late orders; stacked bars show late and other order counts](docs/assets/subcategory-hotspots.svg)
 
 ## What is included
 
@@ -73,6 +73,7 @@ To reproduce the SQL summaries, install PostgreSQL, create a local database name
 
 ## Documentation
 
+- [Portfolio summary](portfolio-project-overview.md): a short standalone case-study summary.
 - [Findings memo](findings-memo.md): business findings, operational interpretation, recommendations, and limitations.
 - [Technical defense](technical-defense.md): data quality, grain, joins, Python and SQL responsibilities, validation, and interview-level explanations.
 - [Analysis appendix](analysis-notes.md): detailed definitions, calculations, cross-tab methodology, and interpretation limits.
@@ -88,8 +89,8 @@ To reproduce the SQL summaries, install PostgreSQL, create a local database name
 - `docs/assets/`: tracked charts used in the portfolio documents.
 - `tests/`: automated validation and regression coverage.
 
-## Data and scope
+## Data and publication scope
 
-This project uses a public dataset. It demonstrates a repeatable analysis pattern: turning operational data into documented rules, validated transformations, and decision-ready analysis without exposing employer data or confidential figures.
+This public repository contains the project documentation, source code, tests, tracked Superstore archive, and chart assets. The extracted CSV and processed outputs are local ignored artifacts. Internal status, handoff, and planning notes are kept in a separate private companion repository under `.private/`, which this repository ignores.
 
 The analysis measures time to shipment, not arrival to the customer. Without an observed promise field, the late flags depend on modeled thresholds. The data does not establish causal financial loss, customer harm, or contractual noncompliance.
