@@ -1,13 +1,10 @@
-# PostgreSQL reproduction
+# PostgreSQL Reproduction
 
-This directory reproduces the Python fulfillment-SLA analysis in PostgreSQL.
-The SQL reads the processed facts, not the raw archive, so the database step
-starts from the same validated inputs as the Python analysis.
+The PostgreSQL script reproduces the scenario summaries from the processed Python facts. It starts after source validation and business-day calculation; it does not independently parse the raw archive.
 
 ## Run it
 
-Run these commands from the repository root after generating the processed
-facts and Python analysis outputs:
+Run these commands from the repository root after setting up the Python environment described in the [project README](../README.md). PostgreSQL and an existing database named `portfolio_sla` are required for the final command:
 
 ```powershell
 .\.venv\Scripts\python.exe -m scripts.transform_superstore
@@ -40,8 +37,7 @@ FROM fact_order_lines
 GROUP BY order_id;
 ```
 
-This prevents a many-to-one join from repeating an order's financial value for
-every line when calculating late-order financial impact.
+This creates one financial row per order before joining to scenario-level status, so the reported sales and profit associated with classified-late orders are counted once per order.
 
 ### 3. SLA assumptions are modeled as rows
 
@@ -49,7 +45,7 @@ The `scenario_sla` table stores one row per scenario and ship mode:
 
 | Scenario | Same Day | First Class | Second Class | Standard Class |
 |---|---:|---:|---:|---:|
-| Base | 0 | 1 | 2 | 5 |
+| Initial benchmark | 0 | 1 | 2 | 5 |
 | Calibrated | 0 | 2 | 3 | 4 |
 | Strict | 0 | 0 | 1 | 4 |
 | Lenient | 0 | 2 | 3 | 6 |
@@ -58,7 +54,7 @@ This is preferable to burying the assumptions inside nested `CASE` logic.
 The calibrated mapping is intentionally explicit because it is not a uniform
 one-day shift: First and Second Class increase while Standard Class decreases.
 
-### 4. `CROSS JOIN` logic is represented by a controlled scenario join
+### 4. Each order is evaluated under each scenario
 
 Each order joins to exactly one SLA row for each scenario through `ship_mode`.
 The resulting primary key is `(scenario, order_id)`, giving 5,009 orders × 4
@@ -101,12 +97,9 @@ outputs. A successful run should report zero failures in every output.
 
 | Scenario | Late orders | Late-order rate |
 |---|---:|---:|
-| Base | 762 | 15.2% |
+| Initial benchmark | 762 | 15.2% |
 | Calibrated | 826 | 16.5% |
 | Strict | 1,875 | 37.4% |
 | Lenient | 300 | 6.0% |
 
-The SQL reproduces the Python results; it does not replace the Python
-transformation. Python remains responsible for source validation and the
-holiday-aware business-day calculation, while PostgreSQL demonstrates the
-relational analysis and aggregation layer.
+Matching summaries confirm that the SQL aggregation agrees with Python for these processed inputs. Python remains responsible for source validation and the holiday-aware business-day calculation.

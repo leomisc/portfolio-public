@@ -1,59 +1,40 @@
 # Superstore Fulfillment SLA Analysis
 
-> **Status:** Source inspection, validated transformation, SLA analysis, PostgreSQL reproduction, findings memo, and technical defense are implemented. A dashboard remains optional.
-
 ## Project question
 
-Where does a shipping promise break, what does it cost operationally, and what should change?
+How does time to shipment vary across service modes, regions, and product groups, and where should an operations team investigate further?
 
-## What I built
+## Project summary
 
-I used the public Superstore dataset to model fulfillment performance from order placement through
-shipment. Because the dataset contains no promised delivery date, I defined a transparent,
-ship-mode-specific SLA and tested how the conclusions changed when that assumption moved by one
-business day.
+This project analyzes order-to-ship time in the public Superstore dataset. Because the source has no promised ship or delivery date, it applies explicit ship-mode thresholds and reports the sensitivity of the results to those assumptions.
 
-The implemented project includes:
+Under the exploratory calibrated scenario, 826 of 5,009 orders (16.5%) exceed their time-to-ship threshold. Rates are 17.4% for First Class, 16.0% for Second Class, 17.6% for Standard Class, and 3.4% for Same Day. The thresholds were selected with reference to this dataset; these rates do not measure performance against an external promise.
 
-- a Python transformation script that profiles the data, validates the grain, and produces the
-  SLA facts plus a direct-key reporting star schema;
-- documented business rules for SLA thresholds, business-day counting, holidays, lateness, and
-  attainment targets;
-- four SQL analyses covering baseline attainment, ship mode and region, monthly trends, and SLA
-  sensitivity;
-- automated tests covering source quality, grain, keys, dates, SLA logic, and star-schema foreign
-  keys; and
-- model documentation covering data quality, joins, grain, key choices, SQL choices, and
-  limitations.
+The analysis compares regional volume and rates, annual ship-mode patterns, and selected product combinations. East has the lowest regional rate despite substantial volume. Among the selected cross-tab cells, Central × Standard Class × Binders has the largest sample: 46 of 200 orders (23.0%) exceed the threshold.
 
-The reporting layer is centered on `fact_order_lines_star`, one row per product
-line within an order, with direct links to `dim_date`, `dim_customer`,
-`dim_location`, `dim_product`, and `dim_ship_mode`. The separate `fact_orders`
-table remains at one row per order so SLA measures are not duplicated across
-order lines. Generated reporting outputs are local ignored files under
-`data/processed/`.
+## What is included
 
-## Technical decisions
+- A validated Python transformation that preserves the source order-line grain and creates a separate one-row-per-order SLA fact.
+- Holiday-aware business-day calculation with explicit endpoint rules.
+- Four SLA scenarios: initial benchmark, calibrated, strict, and lenient.
+- A reporting star schema with direct-key dimensions for dates, customers, locations, products, and ship modes.
+- A PostgreSQL reproduction that aggregates financials at order grain before joining SLA status and reconciles its summaries to Python.
+- Automated tests for source quality, grain, keys, dates, SLA logic, and star-schema foreign keys.
+- Three reproducible SVG charts for regional volume, yearly ship-mode performance, and product hotspots.
 
-The reporting fact remains at order-line grain rather than being silently aggregated to orders. The
-transformation asserts row counts, key uniqueness, foreign-key integrity, valid dates, and non-null
-calculated fields. The SQL uses joins across validated facts, explicit scenario mappings, a date
-spine, and sensitivity scenarios. The source contains repeated Product IDs with different product
-descriptions, so the reporting layer uses a descriptor-based surrogate `product_key` and retains
-the original Product ID as an attribute rather than assuming it is unique.
+## Approach
 
-## Business value
+The project documents business rules, validates source data, separates order-level shipment measures from line-level financial measures, and presents rates with their order counts. The result is a reproducible starting point for an operational review.
 
-The deliverable is designed to answer a practical operations question, not showcase tools in
-isolation: identify where service performance misses the stated promise, distinguish robust findings
-from assumption-sensitive ones, and recommend a concrete next action.
+## Documentation
 
-The written deliverables are [findings-memo.md](findings-memo.md) and
-[technical-defense.md](technical-defense.md). A dashboard remains optional and should be built only
-after the written metrics and definitions are stable.
+- [README](README.md): public project overview and reproduction commands.
+- [Findings memo](findings-memo.md): business findings, operational interpretation, recommendations, and limitations.
+- [Technical defense](technical-defense.md): implementation choices, validation, SQL/Python responsibilities, and technical questions.
+- [Analysis appendix](analysis-notes.md): definitions, calculations, cross-tab methodology, and interpretation limits.
+- [Data model notes](data-model-notes.md): grain, keys, joins, dimensions, and scope constraints.
+- [PostgreSQL reproduction notes](sql/README.md): SQL responsibilities and reconciliation approach.
 
-## Data and confidentiality
+## Data and scope
 
-This project uses public data. It demonstrates the same analysis pattern I use in production: turning
-messy operational data into documented rules, validated transformations, and decision-ready
-analysis without exposing employer data or confidential figures.
+The dataset is public. The results describe shipment timing under modeled thresholds; they do not measure delivery to the customer or contractual SLA performance. The data does not establish causal financial loss or customer harm.
