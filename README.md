@@ -79,7 +79,6 @@ To reproduce the SQL summaries, install PostgreSQL, create a local database name
 
 ## Documentation
 
-- [Portfolio summary](portfolio-project-overview.md): a short standalone case-study summary.
 - [Findings memo](findings-memo.md): business findings, operational interpretation, recommendations, and limitations.
 - [Technical defense](technical-defense.md): data quality, grain, joins, Python and SQL responsibilities, validation, and interview-level explanations.
 - [Analysis appendix](analysis-notes.md): detailed definitions, calculations, cross-tab methodology, and interpretation limits.
