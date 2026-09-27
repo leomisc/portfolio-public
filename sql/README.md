@@ -4,12 +4,12 @@ The PostgreSQL script reproduces the scenario summaries from the processed Pytho
 
 ## Run it
 
-Run these commands from the repository root after setting up the Python environment described in the [project README](../README.md). PostgreSQL and an existing database named `portfolio_sla` are required for the final command:
+Run these commands from the repository root after setting up the Python environment described in the [project README](../README.md). PostgreSQL and an existing database named `portfolio_sla` are required for the final command. The example uses the `postgres` role; substitute your local PostgreSQL role if it differs:
 
 ```powershell
 .\.venv\Scripts\python.exe -m scripts.transform_superstore
 .\.venv\Scripts\python.exe -m scripts.analyze_sla
-psql -d portfolio_sla -f sql/fulfillment_sla_analysis.sql
+psql -U postgres -d portfolio_sla -f sql/fulfillment_sla_analysis.sql
 ```
 
 The script expects `psql` to be connected to an existing database. It uses

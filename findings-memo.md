@@ -2,7 +2,7 @@
 
 ## Decision summary
 
-The public Superstore dataset supports a review of time to shipment. It contains order and ship dates, ship mode, and financial measures, but no promised ship or delivery date. This analysis uses documented ship-mode thresholds and shows how the results change when those thresholds change.
+The fictional Superstore dataset supports a review of time to shipment. It contains order and ship dates, ship mode, and financial measures, but no promised ship or delivery date. This analysis uses documented ship-mode thresholds and shows how the results change when those thresholds change.
 
 The calibrated scenario uses `0/2/3/4` business days for Same Day, First Class, Second Class, and Standard Class. Under that scenario, 826 of 5,009 orders are late, for a 16.5% late-order rate. First Class, Second Class, and Standard Class fall into a similar range. Same Day is lower at 3.4%.
 
@@ -93,7 +93,7 @@ Average order profit is $55.88 for late orders and $57.43 for on-time orders. Th
 
 ## Recommended next action
 
-1. Record the actual promised ship or delivery date and evaluate performance against the relevant promise.
+1. In an equivalent production setting, record the actual promised ship or delivery date and evaluate performance against the relevant promise.
 2. Until that field exists, report time-to-ship rates by mode with one documented threshold set and a sensitivity range.
 3. Review Central × Standard Class × Binders and compare similar orders across regions before changing a broad shipping policy.
 4. Keep order volume beside monthly and cross-tab rates. Small groups can produce unstable percentages.

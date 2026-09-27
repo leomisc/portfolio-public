@@ -213,8 +213,8 @@ def hotspot_chart(scenario: pd.DataFrame, lines: pd.DataFrame) -> str:
     data["label"] = data.apply(lambda r: f"{r['Sub-Category']} · {r['Ship Mode']} · {r['Region']}", axis=1)
     leader_key = tuple(highest_late_count.iloc[0][["Sub-Category", "Ship Mode", "Region"]])
 
-    width, height = 1000, 560
-    left, right, top, bottom = 255, 245, 118, 80
+    width, height = 1040, 560
+    left, right, top, bottom = 280, 245, 118, 80
     plot_w, plot_h = width - left - right, height - top - bottom
     x_map = lambda value: left + value / 250 * plot_w
     row_h = plot_h / len(data)

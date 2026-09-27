@@ -2,7 +2,7 @@
 
 > How does time to ship vary by service mode, and where should an operations review begin?
 
-This project uses the public Superstore dataset to analyze the time between order placement and shipment. The source has no promised ship or delivery date. It therefore uses documented, ship-mode-specific thresholds to classify orders and tests how sensitive the results are to those thresholds.
+This project uses a CSV version of [Tableau's fictional Sample Superstore dataset](https://public.tableau.com/app/resources/sample-data) to analyze the time between order placement and shipment. The source has no promised ship or delivery date. It therefore uses documented, ship-mode-specific thresholds to classify orders and tests how sensitive the results are to those thresholds.
 
 ## Dataset at a glance
 
@@ -75,7 +75,7 @@ if (-not (Test-Path 'data/raw/Sample - Superstore.csv')) {
 .\.venv\Scripts\python.exe scripts\create_portfolio_charts.py
 ```
 
-To reproduce the SQL summaries, install PostgreSQL, create a local database named `portfolio_sla`, and run `psql -d portfolio_sla -f sql\fulfillment_sla_analysis.sql`. The SQL script uses temporary tables and ends with `ROLLBACK`; it does not create persistent database objects.
+To reproduce the SQL summaries, install PostgreSQL and create a local database named `portfolio_sla`. Connect with a role that can create temporary tables; for a default `postgres` role, run `psql -U postgres -d portfolio_sla -f sql\fulfillment_sla_analysis.sql`. Substitute your local role if it differs. The SQL script uses temporary tables and ends with `ROLLBACK`; it does not create persistent database objects.
 
 ## Documentation
 
