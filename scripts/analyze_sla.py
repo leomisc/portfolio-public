@@ -6,12 +6,10 @@ import argparse
 from pathlib import Path
 from typing import Sequence
 
-import numpy as np
 import pandas as pd
 
 
 SCENARIO_SHIFTS = {
-    "base": 0,
     "strict": -1,
     "lenient": 1,
 }
@@ -39,13 +37,15 @@ def aggregate_order_financials(lines: pd.DataFrame) -> pd.DataFrame:
 
 
 def _scenario_sla_days(
-    base_sla_days: pd.Series,
     ship_modes: pd.Series,
     shift: int,
 ) -> pd.Series:
-    """Shift SLA days while keeping Same Day at zero."""
-    shifted = (base_sla_days + shift).clip(lower=0)
-    return shifted.where(ship_modes != "Same Day", 0).astype("int64")
+    """Shift calibrated thresholds while keeping Same Day at zero."""
+    thresholds = {
+        mode: 0 if mode == "Same Day" else days + shift
+        for mode, days in CALIBRATED_SLA_DAYS.items()
+    }
+    return ship_modes.map(thresholds).astype("int64")
 
 
 def build_scenario_orders(
@@ -67,13 +67,14 @@ def build_scenario_orders(
     for scenario in SCENARIO_ORDER:
         current = base_orders.copy()
         current["Scenario"] = scenario
-        if scenario == "calibrated":
+        if scenario == "base":
+            current["Scenario SLA Days"] = current["SLA Days"].astype("int64")
+        elif scenario == "calibrated":
             current["Scenario SLA Days"] = (
                 current["Ship Mode"].map(CALIBRATED_SLA_DAYS).astype("int64")
             )
         else:
             current["Scenario SLA Days"] = _scenario_sla_days(
-                current["SLA Days"],
                 current["Ship Mode"],
                 SCENARIO_SHIFTS[scenario],
             )

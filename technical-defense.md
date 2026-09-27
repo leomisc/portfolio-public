@@ -4,7 +4,7 @@ This document explains the design choices behind the Superstore fulfillment-SLA 
 
 ## One-minute explanation
 
-The source remains at order-line grain; a separate one-row-per-order fact supports time-to-ship classification. Python validates the source, calculates holiday-aware business days, and applies explicit thresholds. PostgreSQL loads the processed facts, aggregates line-level financials by order, produces the same summaries, and reconciles them to Python. The recorded validation run had 21 passing tests and zero SQL reconciliation failures.
+The source remains at order-line grain; a separate one-row-per-order fact supports time-to-ship classification. Python validates the source, calculates holiday-aware business days, and applies explicit thresholds. PostgreSQL loads the processed facts, aggregates line-level financials by order, produces the same summaries, and reconciles them to Python. The current validation run had 22 passing tests and zero SQL reconciliation failures.
 
 ## Source and grain
 
@@ -39,10 +39,10 @@ The scenarios are rows in the SQL model and mappings in the Python analysis:
 |---|---:|---:|---:|---:|
 | Initial benchmark | 0 | 1 | 2 | 5 |
 | Calibrated | 0 | 2 | 3 | 4 |
-| Strict | 0 | 0 | 1 | 4 |
-| Lenient | 0 | 2 | 3 | 6 |
+| Strict | 0 | 1 | 2 | 3 |
+| Lenient | 0 | 3 | 4 | 5 |
 
-The calibrated thresholds were selected using the observed data. They support within-dataset exploration, not an independent assessment of contractual performance. Strict and lenient cases shift only modes with a positive threshold; Same Day remains at zero.
+The calibrated thresholds were selected using the observed data. They support within-dataset exploration, not an independent assessment of contractual performance. Strict and lenient shift each positive calibrated threshold by one business day in opposite directions; Same Day remains at zero.
 
 ## Financial aggregation
 
@@ -84,7 +84,7 @@ The source contains Product IDs with conflicting descriptions. The reporting lay
 
 ## Validation evidence
 
-The recorded local validation run had 21 passing Python tests. A PostgreSQL execution reported zero reconciliation failures for overall, ship-mode, regional, and monthly summaries. The commands below provide the current verification path.
+The current local validation run had 22 passing Python tests. A PostgreSQL execution of the revised scenarios reported zero reconciliation failures for overall, ship-mode, regional, and monthly summaries. The [project README](README.md) provides the reproduction commands.
 
 ## Questions the analysis should withstand
 

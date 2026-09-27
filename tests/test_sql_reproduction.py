@@ -16,6 +16,14 @@ def test_sql_reproduction_has_explicit_sla_scenarios_and_grain_controls():
         "('calibrated', 'First Class', 2)",
         "('calibrated', 'Second Class', 3)",
         "('calibrated', 'Standard Class', 4)",
+        "('strict', 'Same Day', 0)",
+        "('strict', 'First Class', 1)",
+        "('strict', 'Second Class', 2)",
+        "('strict', 'Standard Class', 3)",
+        "('lenient', 'Same Day', 0)",
+        "('lenient', 'First Class', 3)",
+        "('lenient', 'Second Class', 4)",
+        "('lenient', 'Standard Class', 5)",
     ]
 
     for mapping in expected_mappings:

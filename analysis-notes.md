@@ -10,7 +10,7 @@ This appendix records the definitions, calculations, and interpretation limits b
 - A result is successful when `Business Days to Ship <= Scenario SLA Days`.
 - A result is late when `Business Days to Ship > Scenario SLA Days`.
 - Sales and profit associated with classified-late orders are descriptive totals, not estimated costs caused by lateness.
-- Sensitivity exception: Same Day remains at a zero-business-day threshold in the strict and lenient scenarios. The one-day shift applies only to modes with a positive initial threshold.
+- Sensitivity rule: Strict subtracts one business day from each positive calibrated threshold; Lenient adds one. Same Day remains at zero in both.
 
 The observed federal holiday dates are defined in `scripts/transform_superstore.py`. The calendar covers the 2014–2017 source period and January 1, 2018, which is needed for the source's early-January 2018 shipments.
 
@@ -55,8 +55,8 @@ Standard Class has no late orders under the five-day initial benchmark because f
 |---|---:|---:|---:|
 | Initial benchmark, 0/1/2/5 | 762 | 15.2% | $342,370.54 |
 | Calibrated, 0/2/3/4 | 826 | 16.5% | $371,776.00 |
-| Strict, one day less | 1,875 | 37.4% | $871,832.97 |
-| Lenient, one day more | 300 | 6.0% | $114,666.43 |
+| Strict, 0/1/2/3 | 2,364 | 47.2% | $1,068,646.73 |
+| Lenient, 0/3/4/5 | 33 | 0.7% | $17,665.61 |
 
 The classifications are sensitive to the thresholds. Under the initial benchmark, First and Second Class have much higher modeled late rates than Standard Class. Under the calibrated scenario, the three non-Same-Day modes range from 16.0% to 17.6%. That convergence is partly a result of choosing thresholds from the observed data. Neither scenario measures an official contractual SLA.
 

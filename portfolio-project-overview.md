@@ -6,11 +6,11 @@ Where does the time between order placement and shipment warrant closer operatio
 
 ## Method
 
-This project uses the public Superstore dataset to calculate holiday-aware business days from order date to ship date. It evaluates 5,009 orders against documented thresholds for each ship mode, then tests how the results change under alternative thresholds. Order-level shipment status is kept separate from line-level sales and profit to avoid double counting.
+The public Superstore dataset contains 9,994 product-line records for 5,009 orders placed from 2014 through 2017. This project calculates holiday-aware business days from order date to ship date and compares orders with documented thresholds for each ship mode. Order-level shipment status is kept separate from line-level sales and profit to avoid double counting.
 
 ## Findings
 
-Under the exploratory calibrated thresholds, 826 orders (16.5%) are classified as late. The result is sensitive to the assumption: the four scenarios produce overall rates from 6.0% to 37.4%. Regional volume alone does not explain the variation. In the product-level review, Central × Standard Class × Binders has the most classified-late orders of any eligible subcategory, mode, and region cell: 46 of 200 orders (23.0%). Smaller cells have higher rates, so both counts and percentages matter.
+Under the exploratory calibrated thresholds, 826 orders (16.5%) are classified as late. The result is sensitive to the assumption: the four scenarios produce overall rates from 0.7% to 47.2%. Regional volume alone does not explain the variation. In the product-level review, Central × Standard Class × Binders has the most classified-late orders of any eligible subcategory, mode, and region cell: 46 of 200 orders (23.0%). Smaller cells have higher rates, so both counts and percentages matter.
 
 ## Recommended next step
 

@@ -26,12 +26,12 @@ At a four-day threshold, the calibrated scenario classifies the 526 Standard Cla
 
 | Scenario | SLA mapping | Late orders | Late-order rate | Late-order sales |
 |---|---|---:|---:|---:|
-| Lenient | `0/2/3/6` | 300 | 6.0% | $114,666.43 |
+| Lenient | `0/3/4/5` | 33 | 0.7% | $17,665.61 |
 | Initial benchmark | `0/1/2/5` | 762 | 15.2% | $342,370.54 |
 | Calibrated | `0/2/3/4` | 826 | 16.5% | $371,776.00 |
-| Strict | `0/0/1/4` | 1,875 | 37.4% | $871,832.97 |
+| Strict | `0/1/2/3` | 2,364 | 47.2% | $1,068,646.73 |
 
-The sensitivity range is the reason to describe the SLA as modeled. The strict and lenient scenarios are useful stress tests, not recommended operating policies.
+Strict and lenient move each non-Same-Day threshold one business day below or above calibrated, while Same Day remains at zero. The wide 0.7%–47.2% range shows how strongly the classification depends on the threshold; these stress tests are not recommended operating policies.
 
 ## Yearly and monthly results
 

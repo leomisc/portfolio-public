@@ -48,7 +48,7 @@ def test_scenarios_treat_sla_equality_as_success_and_keep_same_day_zero():
     ].iloc[0]
 
     assert not bool(base_a["Is Late"])
-    assert strict_a["Scenario SLA Days"] == 4
+    assert strict_a["Scenario SLA Days"] == 3
     assert bool(strict_a["Is Late"])
     assert lenient_c["Scenario SLA Days"] == 0
     assert not bool(lenient_c["Is Late"])
@@ -64,6 +64,50 @@ def test_calibrated_scenario_uses_observed_sla_mapping():
     assert calibrated.loc["B", "Scenario SLA Days"] == 2
     assert not bool(calibrated.loc["B", "Is Late"])
     assert calibrated.loc["C", "Scenario SLA Days"] == 0
+
+
+def test_sensitivity_scenarios_keep_ship_modes_distinct():
+    orders = pd.concat([
+        make_orders(),
+        pd.DataFrame({
+            "Order ID": ["D"],
+            "Order Date": pd.to_datetime(["2017-03-06"]),
+            "Ship Mode": ["Second Class"],
+            "Region": ["Central"],
+            "Business Days to Ship": [2],
+            "SLA Days": [2],
+            "SLA Variance": [0],
+            "Is Late": [False],
+        }),
+    ], ignore_index=True)
+    lines = pd.concat([
+        make_lines(),
+        pd.DataFrame({
+            "Row ID": ["5"],
+            "Order ID": ["D"],
+            "Sales": [12.0],
+            "Profit": [2.0],
+        }),
+    ], ignore_index=True)
+
+    result = build_scenario_orders(orders, lines)
+    expected = {
+        "strict": {
+            "Same Day": 0,
+            "First Class": 1,
+            "Second Class": 2,
+            "Standard Class": 3,
+        },
+        "lenient": {
+            "Same Day": 0,
+            "First Class": 3,
+            "Second Class": 4,
+            "Standard Class": 5,
+        },
+    }
+    for scenario, mapping in expected.items():
+        actual = result[result["Scenario"] == scenario].set_index("Ship Mode")
+        assert actual["Scenario SLA Days"].to_dict() == mapping
 
 
 def test_lenient_scenario_keeps_same_day_at_zero_by_design():

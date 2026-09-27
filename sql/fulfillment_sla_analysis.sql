@@ -122,6 +122,8 @@ $$;
 -- A normalized mapping table is easier to audit than nested CASE expressions.
 -- The calibrated scenario is explicit rather than derived by a generic shift:
 -- Standard Class moves from 5 to 4 while First and Second Class move upward.
+-- Strict and lenient are one business day below and above calibrated for
+-- First, Second, and Standard Class. Same Day remains at zero.
 CREATE TEMP TABLE scenario_sla (
     scenario text,
     ship_mode text,
@@ -140,13 +142,13 @@ VALUES
     ('calibrated', 'Second Class', 3),
     ('calibrated', 'Standard Class', 4),
     ('strict', 'Same Day', 0),
-    ('strict', 'First Class', 0),
-    ('strict', 'Second Class', 1),
-    ('strict', 'Standard Class', 4),
+    ('strict', 'First Class', 1),
+    ('strict', 'Second Class', 2),
+    ('strict', 'Standard Class', 3),
     ('lenient', 'Same Day', 0),
-    ('lenient', 'First Class', 2),
-    ('lenient', 'Second Class', 3),
-    ('lenient', 'Standard Class', 6);
+    ('lenient', 'First Class', 3),
+    ('lenient', 'Second Class', 4),
+    ('lenient', 'Standard Class', 5);
 
 -- ---------------------------------------------------------------------------
 -- 4. Build one row per order per scenario.

@@ -4,18 +4,24 @@
 
 This project uses the public Superstore dataset to analyze the time between order placement and shipment. The source has no promised ship or delivery date. It therefore uses documented, ship-mode-specific thresholds to classify orders and tests how sensitive the results are to those thresholds.
 
+## Dataset at a glance
+
+The tracked archive contains 9,994 product-line records for 5,009 orders placed from 2014 through 2017. Each line includes order and ship dates, ship mode, customer segment, location, product category and subcategory, quantity, sales, discount, and profit. An order may contain multiple lines, so shipment performance is measured at order grain.
+
 ## SLA assumptions
 
 The analysis uses business days between order and ship date. The order date is excluded, the ship date is included, and observed federal holidays are excluded. A shipment is successful when its business-day count is less than or equal to the applicable threshold.
 
-Two threshold sets frame the results:
+The four modeled threshold sets are in business days:
 
 | Scenario | Same Day | First Class | Second Class | Standard Class | Role |
 |---|---:|---:|---:|---:|---|
 | Initial benchmark | 0 | 1 | 2 | 5 | Original working assumption |
 | Calibrated | 0 | 2 | 3 | 4 | Exploratory comparison based on the observed distribution |
+| Strict | 0 | 1 | 2 | 3 | One day less than calibrated for non-Same-Day modes |
+| Lenient | 0 | 3 | 4 | 5 | One day more than calibrated for non-Same-Day modes |
 
-The calibrated thresholds were chosen after examining this dataset, so they are useful for comparing patterns within it, not for grading performance against an independent promise. The initial benchmark and the strict and lenient sensitivity cases show how much the classification changes when thresholds change.
+The calibrated thresholds were chosen after examining this dataset, so they are useful for comparing patterns within it, not for grading performance against an independent promise. Strict and lenient are symmetric one-day sensitivity cases around calibrated; Same Day stays at zero. The initial benchmark preserves the original working assumption.
 
 ## Headline result
 
@@ -28,7 +34,7 @@ Under the calibrated `0/2/3/4` scenario, 826 of 5,009 orders are classified as l
 | Second Class | 964 | 154 | 16.0% |
 | Standard Class | 2,994 | 526 | 17.6% |
 
-The overall classified-late rate ranges from 6.0% to 37.4% across the four scenarios; the initial benchmark produces 15.2%. These are time-to-ship comparisons under modeled thresholds, not contractual SLA results.
+The overall classified-late rate ranges from 0.7% under lenient to 47.2% under strict; the initial benchmark produces 15.2%. The wide range reflects the observed clustering of shipment times around the chosen thresholds. These are modeled time-to-ship comparisons, not contractual SLA results.
 
 ## What the analysis shows
 

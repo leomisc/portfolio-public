@@ -47,8 +47,8 @@ The `scenario_sla` table stores one row per scenario and ship mode:
 |---|---:|---:|---:|---:|
 | Initial benchmark | 0 | 1 | 2 | 5 |
 | Calibrated | 0 | 2 | 3 | 4 |
-| Strict | 0 | 0 | 1 | 4 |
-| Lenient | 0 | 2 | 3 | 6 |
+| Strict | 0 | 1 | 2 | 3 |
+| Lenient | 0 | 3 | 4 | 5 |
 
 This is preferable to burying the assumptions inside nested `CASE` logic.
 The calibrated mapping is intentionally explicit because it is not a uniform
@@ -99,7 +99,7 @@ outputs. A successful run should report zero failures in every output.
 |---|---:|---:|
 | Initial benchmark | 762 | 15.2% |
 | Calibrated | 826 | 16.5% |
-| Strict | 1,875 | 37.4% |
-| Lenient | 300 | 6.0% |
+| Strict | 2,364 | 47.2% |
+| Lenient | 33 | 0.7% |
 
 Matching summaries confirm that the SQL aggregation agrees with Python for these processed inputs. Python remains responsible for source validation and the holiday-aware business-day calculation.
