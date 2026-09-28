@@ -2,7 +2,7 @@
 
 > How does time to ship vary by service mode, and where should an operations review begin?
 
-This project uses a CSV version of [Tableau's fictional Sample Superstore dataset](https://public.tableau.com/app/resources/sample-data) to analyze the time between order placement and shipment. The source has no promised ship or delivery date. It therefore uses documented, ship-mode-specific thresholds to classify orders and tests how sensitive the results are to those thresholds.
+This project uses the [Superstore Sales Dataset on Kaggle](https://www.kaggle.com/datasets/rohitsahoo/sales-forecasting), which contains a CSV version of [Tableau's fictional Sample Superstore data](https://public.tableau.com/app/resources/sample-data). It analyzes the time between order placement and shipment. The source has no promised ship or delivery date, so documented, ship-mode-specific thresholds are used to classify orders and test how sensitive the results are to those thresholds.
 
 ## Dataset at a glance
 
